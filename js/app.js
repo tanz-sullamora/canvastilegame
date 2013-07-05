@@ -10,26 +10,26 @@ $(function() {
 		{
 			title: 'Level 1',
 			map: [
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
-				['ground', 'rock', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'water', 'water', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'bridge', 'bridge', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'tree', 'tree', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				['rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'water', 'water', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
+				// ['ground', 'rock', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'water', 'water', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'bridge', 'bridge', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'tree', 'tree', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
+				// ['rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'water', 'water', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock'],
 			]
 		}
 	];
@@ -624,6 +624,7 @@ $(function() {
 			1000
 		);
 
+		generateMap();
 		redraw();
 	}
 
