@@ -85,17 +85,25 @@ $(function() {
 
 			var rockFactor = levels[0].rockFactor;
 			var treeFactor = levels[0].treeFactor
-			//var makeForest = (Math.floor((Math.random() * 10) + 1) == 5 && treeFactor > 50) ? true : false;
-			var makeForest = true; // DEV-mode
+			
 
 			/* кампни */
 			for (var i = Math.floor(Math.random() * rockFactor); i--;) {
-				newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
+				var x = Math.floor(Math.random() * HEIGHT);
+				var y = Math.floor(Math.random() * WIDTH);
+
+				if(newMap[x][y] == 'ground') {
+					newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
+				}
+
+				
 			}
 
 			/* деревья */
 			var treeCount = Math.floor(Math.random() * treeFactor);
-			for (var i = treeCount; i > 0; i--) {
+			for (var i = treeCount * 2; i > 0; i--) {
+
+				var makeForest = (Math.floor((Math.random() * 10) > 5) == 1 && treeFactor > 50) ? true : false;
 
 				if(makeForest) {
 					
@@ -112,7 +120,14 @@ $(function() {
 
 
 				} else {
-					newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
+					var x = Math.floor(Math.random() * HEIGHT);
+					var y = Math.floor(Math.random() * WIDTH);
+
+					if(newMap[x][y] == 'ground') {
+						newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
+						i--;
+					}
+					
 				}
 				
 			}
@@ -164,7 +179,7 @@ $(function() {
 
 				switch (direction) {
 					case 0: 
-						if (map[y - 1] != undefined) {
+						if (map[y - 1] != undefined && map[y - 1][x] == 'ground') {
 							map[y - 1][x] = 'tree';	
 							startX = x;
 							startY = y - 1;		
@@ -173,7 +188,7 @@ $(function() {
 						}
 					break;
 					case 1: 
-						if (map[y][x + 1] != undefined) {
+						if (map[y][x + 1] != undefined && map[y][x + 1] == 'ground') {
 							map[y][x + 1] = 'tree';
 							startX = x + 1;
 							startY = y;	
@@ -183,7 +198,7 @@ $(function() {
 						}
 					break;
 					case 2: 
-						if (map[y + 1] != undefined) {
+						if (map[y + 1] != undefined && map[y + 1][x] == 'ground') {
 							map[y + 1][x] = 'tree';
 							startX = x;
 							startY = y + 1;	
@@ -193,7 +208,7 @@ $(function() {
 						}
 					break;
 					case 3: 
-						if (map[y][x - 1] != undefined) {
+						if (map[y][x - 1] != undefined && map[y][x - 1] == 'ground') {
 							map[y][x - 1] = 'tree';
 							startX = x - 1;
 							startY = y;	
@@ -300,6 +315,7 @@ $(function() {
 		context.textBaseline = 'middle';
 
 		context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
+
 	}
 	
 	function redraw() {
