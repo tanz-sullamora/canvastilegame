@@ -80,6 +80,11 @@ $(function() {
 				}
 			}
 
+			/* кампни */
+			for (var i = Math.floor(Math.random() * 30); i--;) {
+				newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
+			}
+
 			/* деревья */
 			for (var i = Math.floor(Math.random() * 170); i--;) {
 				newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
