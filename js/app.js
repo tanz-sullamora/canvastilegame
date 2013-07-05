@@ -9,8 +9,8 @@ $(function() {
 	var levels = [
 		{
 			title		: 'Level 1',
-			rockFactor 	: 20,
-			treeFactor 	: 70,
+			rockFactor 	: 20, // 20% камней
+			treeFactor 	: 70, // 70% леса
 			waterFactor : 10,
 			map: [
 				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
@@ -82,13 +82,22 @@ $(function() {
 					newMap[i][j] = 'ground';
 				}
 			}
+			var maxItemsCount = HEIGHT * WIDTH;
+			console.log("total: " + maxItemsCount);
 
 			var rockFactor = levels[0].rockFactor;
 			var treeFactor = levels[0].treeFactor
 			
+			var treeCount =  Math.floor(maxItemsCount * (Math.random() * treeFactor) / 100);
+			var rockCount =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
+
+
+			console.log("trees: " + treeCount);
+			console.log("rocks: " + rockCount);
+
 
 			/* кампни */
-			for (var i = Math.floor(Math.random() * rockFactor); i--;) {
+			for (var i = rockCount; i--;) {
 				var x = Math.floor(Math.random() * HEIGHT);
 				var y = Math.floor(Math.random() * WIDTH);
 
@@ -99,17 +108,60 @@ $(function() {
 				
 			}
 
-			/* деревья */
-			var treeCount = Math.floor(Math.random() * treeFactor);
-			for (var i = treeCount * 2; i > 0; i--) {
+			
+			
 
-				var makeForest = (Math.floor((Math.random() * 10) > 5) == 1 && treeFactor > 50) ? true : false;
+
+			/* деревья */
+			
+
+			
+
+
+			for (var i = treeCount; i > 0; i--) {
+
+				var makeForest = (Math.floor((Math.random() * 10)) > 4 && treeFactor > 50) ? true : false;
 
 				if(makeForest) {
 					
 					// сажаем одно дерево произвольно 
 					var randomX = Math.floor(Math.random() * HEIGHT);
 					var randomY = Math.floor(Math.random() * WIDTH);
+
+
+					// попытаемся посмотреть, был ли уже лес на верхней и левой границах
+					var prevForestCoords = [];
+					for (var j = WIDTH; j--;) {
+						if (levels[0].map[blockY - 1] != undefined && levels[0].map[blockY - 1][blockX + j] != undefined && levels[0].map[blockY - 1][blockX + j] == 'tree') {
+							//newMap[0][i] = 'water';
+							prevForestCoords.push([j, 1]);
+						}
+						if (levels[0].map[blockY + HEIGHT - 1] != undefined && levels[0].map[blockY + HEIGHT - 1][blockX + j] != undefined && levels[0].map[blockY + HEIGHT - 1][blockX + j] == 'tree') {
+							//newMap[HEIGHT - 1][i] = 'water';
+							prevForestCoords.push([j, HEIGHT + 1]);
+						}
+					}
+
+					for (var j = HEIGHT; j--;) {
+						if (levels[0].map[blockY + j] != undefined && levels[0].map[blockY + j][blockX - 1] != undefined && levels[0].map[blockY + j][blockX - 1] == 'tree') {
+							//newMap[i][0] = 'water';
+							prevForestCoords.push([1, i]);
+						}
+						if (levels[0].map[blockY + j] != undefined && levels[0].map[blockY + j][blockX + WIDTH - 1] != undefined && levels[0].map[blockY + j][blockX + WIDTH - 1] == 'tree') {
+							//newMap[i][WIDTH - 1] = 'water';
+							prevForestCoords.push([WIDTH + 1, j]);
+						}
+					}
+
+					
+					var usePrevForest = (Math.floor((Math.random() * 10)) > 5 && treeFactor > 50) ? true : false;
+
+					if(prevForestCoords.length > 0 && usePrevForest) {
+						
+						var poo = prevForestCoords[Math.floor(Math.random() * prevForestCoords.length)];
+						randomX = poo[0];
+						randomY = poo[1];
+					}
 
 					// сколько деревьев посадим в группе
 					var treeGroupCount = Math.floor(Math.random() * i);
@@ -170,59 +222,32 @@ $(function() {
 			return newMap;
 		}
 
-		function drawForest(map, count, startX, startY) {
+		function drawForest(map, count, x, y) {
 
-			for(var i = count; i > 0; i--) {
-				var direction = Math.round(Math.random() * 4),
-					x = startX,
-					y = startY;
+			 for (var i = count; i--;) {
+			  	var direction = Math.round(Math.random() * 4);
 
 				switch (direction) {
-					case 0: 
-						if (map[y - 1] != undefined && map[y - 1][x] == 'ground') {
-							map[y - 1][x] = 'tree';	
-							startX = x;
-							startY = y - 1;		
-						} else {
-							i++;
-						}
-					break;
-					case 1: 
-						if (map[y][x + 1] != undefined && map[y][x + 1] == 'ground') {
-							map[y][x + 1] = 'tree';
-							startX = x + 1;
-							startY = y;	
-							
-						} else {
-							i++;
-						}
-					break;
-					case 2: 
-						if (map[y + 1] != undefined && map[y + 1][x] == 'ground') {
-							map[y + 1][x] = 'tree';
-							startX = x;
-							startY = y + 1;	
-							
-						} else {
-							i++;
-						}
-					break;
-					case 3: 
-						if (map[y][x - 1] != undefined && map[y][x - 1] == 'ground') {
-							map[y][x - 1] = 'tree';
-							startX = x - 1;
-							startY = y;	
-							
-						} else {
-							i++;
-						}
-					break;
+				   	case 0: 
+				    	y--;
+				   		break;
+				   	case 1: 
+				    	x++;
+				   		break;
+				   	case 2: 
+				   	 	y++;
+				   		break;
+				    case 3: 
+				    	x--;
+				   		break;
 				}
 
+		 		if (map[y] != undefined && map[y][x] != undefined && map[y][x] == 'ground') {
+		   			map[y][x] = 'tree';
+		 		}
 			}
 
-			return map;
-
+			 return map;
 		}
 
 		function drawRivers(map, sources) {
