@@ -1,7 +1,7 @@
 $(function() {
 	
-	var WIDTH = 20;
-	var HEIGHT = 20;
+	var WIDTH = 20,
+		HEIGHT = 20;
 
 	var canvasElement = $('#cnv'),
 		context = canvasElement[0].getContext('2d');
@@ -10,30 +10,9 @@ $(function() {
 		{
 			title		: 'Level 1',
 			rockFactor 	: 20,
-			treeFactor 	: 70,
+			treeFactor 	: 51,
 			waterFactor : 10,
-			map: [
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
-				// ['ground', 'rock', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'water', 'water', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'bridge', 'bridge', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'tree', 'tree', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'water', 'water', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock'],
-			]
+			map: [ ]
 		}
 	];
 
@@ -48,14 +27,14 @@ $(function() {
 	};
 
 	var player = {
-		coords: [1, 1],
+		coords: [0, 0],
 		items: {},
 		selectedItem: null
 	};
 
 	var placeholder = {
 		show: false,
-		coords: [1, 1]
+		coords: [0, 0]
 	};
 
 	var images = {};
@@ -84,33 +63,28 @@ $(function() {
 			}
 
 			var rockFactor = levels[0].rockFactor;
-			var treeFactor = levels[0].treeFactor
-			//var makeForest = (Math.floor((Math.random() * 10) + 1) == 5 && treeFactor > 50) ? true : false;
-			var makeForest = true; // DEV-mode
+			var treeFactor = levels[0].treeFactor;
 
-			/* кампни */
+			/* камни */
 			for (var i = Math.floor(Math.random() * rockFactor); i--;) {
 				newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
 			}
 
 			/* деревья */
 			var treeCount = Math.floor(Math.random() * treeFactor);
-			for (var i = treeCount; i > 0; i--) {
+			for (var i = treeCount; i--;) {
 
-				if(makeForest) {
+				if ((Math.floor(Math.random() * 5) == 2) && (treeFactor > 50)) {
 					
 					// сажаем одно дерево произвольно 
-					var randomX = Math.floor(Math.random() * HEIGHT);
-					var randomY = Math.floor(Math.random() * WIDTH);
+					var randomX = Math.floor(Math.random() * HEIGHT),
+						randomY = Math.floor(Math.random() * WIDTH);
 
 					// сколько деревьев посадим в группе
 					var treeGroupCount = Math.floor(Math.random() * i);
-
-					newMap = drawForest(newMap, treeGroupCount, randomX, randomY);
-
 					i -= treeGroupCount;
 
-
+					newMap = drawForest(newMap, treeGroupCount, randomX, randomY);
 				} else {
 					newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
 				}
@@ -155,59 +129,31 @@ $(function() {
 			return newMap;
 		}
 
-		function drawForest(map, count, startX, startY) {
-
-			for(var i = count; i > 0; i--) {
-				var direction = Math.round(Math.random() * 4),
-					x = startX,
-					y = startY;
+		function drawForest(map, count, x, y) {
+			for (var i = count; i--;) {
+				var direction = Math.round(Math.random() * 4);
 
 				switch (direction) {
 					case 0: 
-						if (map[y - 1] != undefined) {
-							map[y - 1][x] = 'tree';	
-							startX = x;
-							startY = y - 1;		
-						} else {
-							i++;
-						}
+						y--;
 					break;
 					case 1: 
-						if (map[y][x + 1] != undefined) {
-							map[y][x + 1] = 'tree';
-							startX = x + 1;
-							startY = y;	
-							
-						} else {
-							i++;
-						}
+						x++;
 					break;
 					case 2: 
-						if (map[y + 1] != undefined) {
-							map[y + 1][x] = 'tree';
-							startX = x;
-							startY = y + 1;	
-							
-						} else {
-							i++;
-						}
+						y++;
 					break;
 					case 3: 
-						if (map[y][x - 1] != undefined) {
-							map[y][x - 1] = 'tree';
-							startX = x - 1;
-							startY = y;	
-							
-						} else {
-							i++;
-						}
+						x--;
 					break;
 				}
 
+				if (map[y] != undefined && map[y][x] != undefined) {
+					map[y][x] = 'tree';
+				}
 			}
 
 			return map;
-
 		}
 
 		function drawRivers(map, sources) {
@@ -217,46 +163,32 @@ $(function() {
 					y = sources[i][1];
 
 				switch (direction) {
-					case 0: 
-						if (map[y - 1] != undefined) {
-							map[y - 1][x] = 'water';
-							sources[i] = [x, y - 1];
-						} else {
-							sources.splice(i, 1);
-						}
+					case 0:
+						y--; 
 					break;
 					case 1: 
-						if (map[y][x + 1] != undefined) {
-							map[y][x + 1] = 'water';
-							sources[i] = [x + 1, y];
-						} else {
-							sources.splice(i, 1);
-						}
+						x++;
 					break;
 					case 2: 
-						if (map[y + 1] != undefined) {
-							map[y + 1][x] = 'water';
-							sources[i] = [x, y + 1];
-						} else {
-							sources.splice(i, 1);
-						}
+						y++;
 					break;
 					case 3: 
-						if (map[y][x - 1] != undefined) {
-							map[y][x - 1] = 'water';
-							sources[i] = [x - 1, y];
-						} else {
-							sources.splice(i, 1);
-						}
+						x--;
 					break;
+				}
+
+				if (map[y] != undefined) {
+					map[y][x] = 'water';
+					sources[i] = [x, y];
+				} else {
+					sources.splice(i, 1);
 				}
 			}
 
 			if (sources.length > 0) {
 				return drawRivers(map, sources);
 			} 
-			return map;
-			
+			return map;			
 		}
 
 		function addBlock(blockX, blockY) {
@@ -330,8 +262,10 @@ $(function() {
 	function environment() {
 		var modified = [];
 
-		for (var i = levels[0].map.length; i--;) {
-			for (var j = levels[0].map[i].length; j--;) {
+		var offset = getOffset();
+
+		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
+			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 
 				var neighbourhood = [
 					((levels[0].map[i - 1] == undefined || levels[0].map[i - 1][j] == undefined) ? null : levels[0].map[i - 1][j]),
@@ -703,6 +637,9 @@ $(function() {
 			redraw();
 		});
 
+		generateMap();
+		redraw();
+
 		setInterval(
 			function() {
 				environment();
@@ -710,9 +647,6 @@ $(function() {
 			},
 			1000
 		);
-
-		generateMap();
-		redraw();
 	}
 
 	initImages(
