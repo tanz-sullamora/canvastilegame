@@ -46,6 +46,9 @@ $(function() {
 			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
 					context.drawImage(getBlockSprite(levels[0].map[i][j]), (j - offset[0]) * 30, (i - offset[1]) * 30);
+				} else {
+					context.fillStyle = '#000';
+					context.fillRect((j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
 				}
 			}
 		}
@@ -194,25 +197,84 @@ $(function() {
 		function addBlock(blockX, blockY) {
 			var newMap = generateBlock(blockX * WIDTH, blockY * HEIGHT);
 			for (var i = HEIGHT; i--;) {
-				levels[0].map[blockY * HEIGHT + i].splice.apply(levels[0].map[blockY * HEIGHT + i], [blockX * WIDTH + i, WIDTH].concat(newMap[i]));
+				for (var j = WIDTH; j--;) {
+					levels[0].map[blockY * HEIGHT + i][blockX * WIDTH + j] = newMap[i][j];
+				}
+			}
+		}
+		
+		function addRow(blockY) {
+			var width = levels[0].map[blockY - 1] == undefined ? WIDTH : levels[0].map[blockY - 1].length;
+			for (var i = HEIGHT; i--;) {
+				levels[0].map[blockY + i] = [];
 			}
 		}
 
-		var blockX = Math.round(player.coords[0] / WIDTH),
-			blockY = Math.round(player.coords[1] / HEIGHT);
+		var blockX = Math.floor(player.coords[0] / WIDTH),
+		 	blockY = Math.floor(player.coords[1] / HEIGHT),
+			playerBlockX = player.coords[0] - blockX * WIDTH,
+			playerBlockY = player.coords[1] - blockY * HEIGHT,
+			halfWIDTH = Math.round(WIDTH / 2),
+			halfHEIGHT = Math.round(HEIGHT / 2);
 
 		if (levels[0].map[blockY * HEIGHT] == undefined) {
-			for (var i = HEIGHT; i--;) {
-				levels[0].map[blockY * HEIGHT + i] = [];
+			addRow(blockY * HEIGHT);
+		}
+
+		if (blockX == 0 && levels[0].map[blockY * HEIGHT][blockX * WIDTH] == undefined) {
+			addBlock(blockX, blockY);
+			return;
+		}
+
+		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
+			addRow((blockY + 1) * HEIGHT);
+		}
+		
+		if (playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[blockY * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY);
+		}
+		if (playerBlockX <= halfWIDTH && blockX > 0 && playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY - 1);
+		}
+		if (playerBlockX <= halfWIDTH && blockX > 0 && playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY + 1);
+		}
+
+		if (playerBlockX > halfWIDTH && levels[0].map[blockY * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY);
+		}
+		if (playerBlockX > halfWIDTH && playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY - 1);
+		}
+		if (playerBlockX > halfWIDTH && playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY + 1);
+		}
+		
+		if (playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][blockX * WIDTH] == undefined) {
+			addBlock(blockX, blockY - 1);
+		}
+		if (playerBlockY <= halfHEIGHT && blockY > 0 && playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY - 1);
+		}
+		if (playerBlockY <= halfHEIGHT && blockY > 0 && playerBlockX > halfWIDTH && levels[0].map[(blockY - 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY - 1);
+		}
+		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
+			if (levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
+				addRow((blockY + 1) * HEIGHT);
 			}
 		}
 
-		if (levels[0].map[blockY * HEIGHT][blockX * WIDTH] == undefined) {
-			addBlock(blockX, blockY);
+		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][blockX * WIDTH] == undefined) {
+			addBlock(blockX, blockY + 1);
 		}
-		if (levels[0].map[(blockY - 1) * HEIGHT] != undefined && levels[0].map[(blockY - 1) * HEIGHT][blockX * WIDTH] == undefined) {
-			addBlock(blockX, blockY - 1);
+		if (playerBlockY > halfHEIGHT && playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[(blockY + 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY + 1);
 		}
+		if (playerBlockY > halfHEIGHT && playerBlockX > halfWIDTH && levels[0].map[(blockY + 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY + 1);
+		}
+
 	}
 
 	function getBlockSprite(blockType) {
