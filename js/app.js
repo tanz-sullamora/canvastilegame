@@ -9,8 +9,8 @@ $(function() {
 	var levels = [
 		{
 			title		: 'Level 1',
-			rockFactor 	: 20,
-			treeFactor 	: 51,
+			rockFactor 	: 20, // 20% камней
+			treeFactor 	: 70, // 70% леса
 			waterFactor : 10,
 			map: [ ]
 		}
@@ -64,24 +64,68 @@ $(function() {
 					newMap[i][j] = 'ground';
 				}
 			}
+			var maxItemsCount = HEIGHT * WIDTH;
 
 			var rockFactor = levels[0].rockFactor;
-			var treeFactor = levels[0].treeFactor;
+			var treeFactor = levels[0].treeFactor
+			
+			var treeCount =  Math.floor(maxItemsCount * (Math.random() * treeFactor) / 100);
+			var rockCount =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
 
 			/* камни */
-			for (var i = Math.floor(Math.random() * rockFactor); i--;) {
-				newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
+			for (var i = rockCount; i--;) {
+				var x = Math.floor(Math.random() * HEIGHT);
+				var y = Math.floor(Math.random() * WIDTH);
+
+				if(newMap[x][y] == 'ground') {
+					newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
+				}
 			}
 
 			/* деревья */
-			var treeCount = Math.floor(Math.random() * treeFactor);
-			for (var i = treeCount; i--;) {
+			for (var i = treeCount; i > 0; i--) {
+				var makeForest = (Math.floor((Math.random() * 10)) > 4 && treeFactor > 50) ? true : false;
 
-				if ((Math.floor(Math.random() * 5) == 2) && (treeFactor > 50)) {
-					
+				if (makeForest) {
+			
 					// сажаем одно дерево произвольно 
 					var randomX = Math.floor(Math.random() * HEIGHT),
 						randomY = Math.floor(Math.random() * WIDTH);
+
+
+					// попытаемся посмотреть, был ли уже лес на верхней и левой границах
+					var prevForestCoords = [];
+					for (var j = WIDTH; j--;) {
+						if (levels[0].map[blockY - 1] != undefined && levels[0].map[blockY - 1][blockX + j] != undefined && levels[0].map[blockY - 1][blockX + j] == 'tree') {
+							//newMap[0][i] = 'water';
+							prevForestCoords.push([j, 1]);
+						}
+						if (levels[0].map[blockY + HEIGHT - 1] != undefined && levels[0].map[blockY + HEIGHT - 1][blockX + j] != undefined && levels[0].map[blockY + HEIGHT - 1][blockX + j] == 'tree') {
+							//newMap[HEIGHT - 1][i] = 'water';
+							prevForestCoords.push([j, HEIGHT + 1]);
+						}
+					}
+
+					for (var j = HEIGHT; j--;) {
+						if (levels[0].map[blockY + j] != undefined && levels[0].map[blockY + j][blockX - 1] != undefined && levels[0].map[blockY + j][blockX - 1] == 'tree') {
+							//newMap[i][0] = 'water';
+							prevForestCoords.push([1, i]);
+						}
+						if (levels[0].map[blockY + j] != undefined && levels[0].map[blockY + j][blockX + WIDTH - 1] != undefined && levels[0].map[blockY + j][blockX + WIDTH - 1] == 'tree') {
+							//newMap[i][WIDTH - 1] = 'water';
+							prevForestCoords.push([WIDTH + 1, j]);
+						}
+					}
+
+					
+					var usePrevForest = (Math.floor((Math.random() * 10)) > 5 && treeFactor > 50) ? true : false;
+
+					if (prevForestCoords.length > 0 && usePrevForest) {
+						
+						var poo = prevForestCoords[Math.floor(Math.random() * prevForestCoords.length)];
+						randomX = poo[0];
+						randomY = poo[1];
+					}
 
 					// сколько деревьев посадим в группе
 					var treeGroupCount = Math.floor(Math.random() * i);
@@ -89,7 +133,14 @@ $(function() {
 
 					newMap = drawForest(newMap, treeGroupCount, randomX, randomY);
 				} else {
-					newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
+					var x = Math.floor(Math.random() * HEIGHT);
+					var y = Math.floor(Math.random() * WIDTH);
+
+					if(newMap[x][y] == 'ground') {
+						newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
+						i--;
+					}
+					
 				}
 				
 			}
@@ -134,26 +185,26 @@ $(function() {
 
 		function drawForest(map, count, x, y) {
 			for (var i = count; i--;) {
-				var direction = Math.round(Math.random() * 4);
+			  	var direction = Math.round(Math.random() * 4);
 
 				switch (direction) {
-					case 0: 
-						y--;
-					break;
-					case 1: 
-						x++;
-					break;
-					case 2: 
-						y++;
-					break;
-					case 3: 
-						x--;
-					break;
+				   	case 0: 
+				    	y--;
+				   		break;
+				   	case 1: 
+				    	x++;
+				   		break;
+				   	case 2: 
+				   	 	y++;
+				   		break;
+				    case 3: 
+				    	x--;
+				   		break;
 				}
 
-				if (map[y] != undefined && map[y][x] != undefined) {
-					map[y][x] = 'tree';
-				}
+		 		if (map[y] != undefined && map[y][x] != undefined && map[y][x] == 'ground') {
+		   			map[y][x] = 'tree';
+		 		}
 			}
 
 			return map;
@@ -211,7 +262,7 @@ $(function() {
 		}
 
 		var blockX = Math.floor(player.coords[0] / WIDTH),
-		 	blockY = Math.floor(player.coords[1] / HEIGHT),
+			blockY = Math.floor(player.coords[1] / HEIGHT),
 			playerBlockX = player.coords[0] - blockX * WIDTH,
 			playerBlockY = player.coords[1] - blockY * HEIGHT,
 			halfWIDTH = Math.round(WIDTH / 2),
@@ -227,7 +278,9 @@ $(function() {
 		}
 
 		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
-			addRow((blockY + 1) * HEIGHT);
+			if (levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
+				addRow((blockY + 1) * HEIGHT);
+			}
 		}
 		
 		if (playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[blockY * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
@@ -243,6 +296,7 @@ $(function() {
 		if (playerBlockX > halfWIDTH && levels[0].map[blockY * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
 			addBlock(blockX + 1, blockY);
 		}
+
 		if (playerBlockX > halfWIDTH && playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
 			addBlock(blockX + 1, blockY - 1);
 		}
@@ -253,26 +307,9 @@ $(function() {
 		if (playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][blockX * WIDTH] == undefined) {
 			addBlock(blockX, blockY - 1);
 		}
-		if (playerBlockY <= halfHEIGHT && blockY > 0 && playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
-			addBlock(blockX - 1, blockY - 1);
-		}
-		if (playerBlockY <= halfHEIGHT && blockY > 0 && playerBlockX > halfWIDTH && levels[0].map[(blockY - 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
-			addBlock(blockX + 1, blockY - 1);
-		}
-		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
-			if (levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
-				addRow((blockY + 1) * HEIGHT);
-			}
-		}
 
 		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][blockX * WIDTH] == undefined) {
 			addBlock(blockX, blockY + 1);
-		}
-		if (playerBlockY > halfHEIGHT && playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[(blockY + 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
-			addBlock(blockX - 1, blockY + 1);
-		}
-		if (playerBlockY > halfHEIGHT && playerBlockX > halfWIDTH && levels[0].map[(blockY + 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
-			addBlock(blockX + 1, blockY + 1);
 		}
 
 	}
@@ -294,6 +331,7 @@ $(function() {
 		context.textBaseline = 'middle';
 
 		context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
+
 	}
 	
 	function redraw() {
