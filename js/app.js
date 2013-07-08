@@ -40,6 +40,21 @@ $(function() {
 
 	var images = {};
 
+	var drop  = {
+		'tree' : [
+			{
+				'name' : 'hueta1',
+				'droprate' : 5,
+				'title' : 'Неведомая хуета из дерева' 
+			},
+			{
+				'name' : 'hueta2',
+				'droprate' : 10,
+				'title' : 'Еще одна неведомая хуета из дерева' 
+			}
+		]
+	}
+
 	function drawLevel() {
 		var offset = getOffset();
 
@@ -669,9 +684,31 @@ $(function() {
 
 				if (interactive.opposite !== null) {
 					levels[0].map[placeholder.coords[1]][placeholder.coords[0]] = interactive.opposite;
-					pickItem(blockType);
-					log(message('execute', blockType));
 				}
+				pickItem(blockType);
+				log(message('execute', blockType));
+				player.executing = false;
+
+				//random drop
+
+				if(drop[blockType] !== undefined) {
+
+					var dropped = false;
+					for(var i in drop[blockType]) {
+						var item = drop[blockType][i];
+
+						var rand = Math.floor(Math.random() * item.droprate + 1);
+						var dropItem = (rand == 1) ? true : false;
+
+						if(dropItem) {
+							dropped = true;
+
+							log('Воу, воу, воу! Подобрал "'+item.title+'"');
+							break;
+						}
+					}
+				}
+
 			}, interactive.duration);
 
 			
