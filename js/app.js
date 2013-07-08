@@ -346,7 +346,11 @@ $(function() {
 		context.textAlign = 'center';
 		context.textBaseline = 'middle';
 
-		context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
+		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
+
+		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30);
+
+
 
 	}
 	
@@ -839,7 +843,8 @@ $(function() {
 			{type: 'water', source: 'img/water.png'},
 			{type: 'bridge', source: 'img/bridge.png'},
 			{type: 'blackhole', source: 'img/grass.png'},
-			{type: 'pit', source: 'img/pit.png'}
+			{type: 'pit', source: 'img/pit.png'},
+			{type: 'player', source: 'img/player.png'},
 		],
 		startGame
 	);
