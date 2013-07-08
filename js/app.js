@@ -1,7 +1,7 @@
 $(function() {
 	
-	var WIDTH = 20;
-	var HEIGHT = 20;
+	var WIDTH = 20,
+		HEIGHT = 20;
 
 	var canvasElement = $('#cnv'),
 		context = canvasElement[0].getContext('2d');
@@ -12,28 +12,7 @@ $(function() {
 			rockFactor 	: 20, // 20% камней
 			treeFactor 	: 70, // 70% леса
 			waterFactor : 10,
-			map: [
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
-				// ['ground', 'rock', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'water', 'water', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'water', 'water', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'bridge', 'bridge', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'tree', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'tree', 'tree', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground', 'water', 'water', 'ground', 'ground', 'ground', 'ground', 'ground', 'ground'],
-				// ['rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock', 'water', 'water', 'rock', 'rock', 'rock', 'rock', 'rock', 'rock'],
-			]
+			map: [ ]
 		}
 	];
 
@@ -48,14 +27,14 @@ $(function() {
 	};
 
 	var player = {
-		coords: [1, 1],
+		coords: [0, 0],
 		items: {},
 		selectedItem: null
 	};
 
 	var placeholder = {
 		show: false,
-		coords: [1, 1]
+		coords: [0, 0]
 	};
 
 	var images = {};
@@ -67,6 +46,9 @@ $(function() {
 			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
 					context.drawImage(getBlockSprite(levels[0].map[i][j]), (j - offset[0]) * 30, (i - offset[1]) * 30);
+				} else {
+					context.fillStyle = '#000';
+					context.fillRect((j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
 				}
 			}
 		}
@@ -83,7 +65,6 @@ $(function() {
 				}
 			}
 			var maxItemsCount = HEIGHT * WIDTH;
-			console.log("total: " + maxItemsCount);
 
 			var rockFactor = levels[0].rockFactor;
 			var treeFactor = levels[0].treeFactor
@@ -91,12 +72,7 @@ $(function() {
 			var treeCount =  Math.floor(maxItemsCount * (Math.random() * treeFactor) / 100);
 			var rockCount =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
 
-
-			console.log("trees: " + treeCount);
-			console.log("rocks: " + rockCount);
-
-
-			/* кампни */
+			/* камни */
 			for (var i = rockCount; i--;) {
 				var x = Math.floor(Math.random() * HEIGHT);
 				var y = Math.floor(Math.random() * WIDTH);
@@ -104,29 +80,17 @@ $(function() {
 				if(newMap[x][y] == 'ground') {
 					newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'rock';
 				}
-
-				
 			}
 
-			
-			
-
-
 			/* деревья */
-			
-
-			
-
-
 			for (var i = treeCount; i > 0; i--) {
-
 				var makeForest = (Math.floor((Math.random() * 10)) > 4 && treeFactor > 50) ? true : false;
 
-				if(makeForest) {
-					
+				if (makeForest) {
+			
 					// сажаем одно дерево произвольно 
-					var randomX = Math.floor(Math.random() * HEIGHT);
-					var randomY = Math.floor(Math.random() * WIDTH);
+					var randomX = Math.floor(Math.random() * HEIGHT),
+						randomY = Math.floor(Math.random() * WIDTH);
 
 
 					// попытаемся посмотреть, был ли уже лес на верхней и левой границах
@@ -156,7 +120,7 @@ $(function() {
 					
 					var usePrevForest = (Math.floor((Math.random() * 10)) > 5 && treeFactor > 50) ? true : false;
 
-					if(prevForestCoords.length > 0 && usePrevForest) {
+					if (prevForestCoords.length > 0 && usePrevForest) {
 						
 						var poo = prevForestCoords[Math.floor(Math.random() * prevForestCoords.length)];
 						randomX = poo[0];
@@ -165,12 +129,9 @@ $(function() {
 
 					// сколько деревьев посадим в группе
 					var treeGroupCount = Math.floor(Math.random() * i);
-
-					newMap = drawForest(newMap, treeGroupCount, randomX, randomY);
-
 					i -= treeGroupCount;
 
-
+					newMap = drawForest(newMap, treeGroupCount, randomX, randomY);
 				} else {
 					var x = Math.floor(Math.random() * HEIGHT);
 					var y = Math.floor(Math.random() * WIDTH);
@@ -223,8 +184,7 @@ $(function() {
 		}
 
 		function drawForest(map, count, x, y) {
-
-			 for (var i = count; i--;) {
+			for (var i = count; i--;) {
 			  	var direction = Math.round(Math.random() * 4);
 
 				switch (direction) {
@@ -247,7 +207,7 @@ $(function() {
 		 		}
 			}
 
-			 return map;
+			return map;
 		}
 
 		function drawRivers(map, sources) {
@@ -257,70 +217,101 @@ $(function() {
 					y = sources[i][1];
 
 				switch (direction) {
-					case 0: 
-						if (map[y - 1] != undefined) {
-							map[y - 1][x] = 'water';
-							sources[i] = [x, y - 1];
-						} else {
-							sources.splice(i, 1);
-						}
+					case 0:
+						y--; 
 					break;
 					case 1: 
-						if (map[y][x + 1] != undefined) {
-							map[y][x + 1] = 'water';
-							sources[i] = [x + 1, y];
-						} else {
-							sources.splice(i, 1);
-						}
+						x++;
 					break;
 					case 2: 
-						if (map[y + 1] != undefined) {
-							map[y + 1][x] = 'water';
-							sources[i] = [x, y + 1];
-						} else {
-							sources.splice(i, 1);
-						}
+						y++;
 					break;
 					case 3: 
-						if (map[y][x - 1] != undefined) {
-							map[y][x - 1] = 'water';
-							sources[i] = [x - 1, y];
-						} else {
-							sources.splice(i, 1);
-						}
+						x--;
 					break;
+				}
+
+				if (map[y] != undefined) {
+					map[y][x] = 'water';
+					sources[i] = [x, y];
+				} else {
+					sources.splice(i, 1);
 				}
 			}
 
 			if (sources.length > 0) {
 				return drawRivers(map, sources);
 			} 
-			return map;
-			
+			return map;			
 		}
 
 		function addBlock(blockX, blockY) {
 			var newMap = generateBlock(blockX * WIDTH, blockY * HEIGHT);
 			for (var i = HEIGHT; i--;) {
-				levels[0].map[blockY * HEIGHT + i].splice.apply(levels[0].map[blockY * HEIGHT + i], [blockX * WIDTH + i, WIDTH].concat(newMap[i]));
+				for (var j = WIDTH; j--;) {
+					levels[0].map[blockY * HEIGHT + i][blockX * WIDTH + j] = newMap[i][j];
+				}
+			}
+		}
+		
+		function addRow(blockY) {
+			var width = levels[0].map[blockY - 1] == undefined ? WIDTH : levels[0].map[blockY - 1].length;
+			for (var i = HEIGHT; i--;) {
+				levels[0].map[blockY + i] = [];
 			}
 		}
 
-		var blockX = Math.round(player.coords[0] / WIDTH),
-			blockY = Math.round(player.coords[1] / HEIGHT);
+		var blockX = Math.floor(player.coords[0] / WIDTH),
+			blockY = Math.floor(player.coords[1] / HEIGHT),
+			playerBlockX = player.coords[0] - blockX * WIDTH,
+			playerBlockY = player.coords[1] - blockY * HEIGHT,
+			halfWIDTH = Math.round(WIDTH / 2),
+			halfHEIGHT = Math.round(HEIGHT / 2);
 
 		if (levels[0].map[blockY * HEIGHT] == undefined) {
-			for (var i = HEIGHT; i--;) {
-				levels[0].map[blockY * HEIGHT + i] = [];
-			}
+			addRow(blockY * HEIGHT);
 		}
 
-		if (levels[0].map[blockY * HEIGHT][blockX * WIDTH] == undefined) {
+		if (blockX == 0 && levels[0].map[blockY * HEIGHT][blockX * WIDTH] == undefined) {
 			addBlock(blockX, blockY);
+			return;
 		}
-		if (levels[0].map[(blockY - 1) * HEIGHT] != undefined && levels[0].map[(blockY - 1) * HEIGHT][blockX * WIDTH] == undefined) {
+
+		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
+			if (levels[0].map[(blockY + 1) * HEIGHT] == undefined) {
+				addRow((blockY + 1) * HEIGHT);
+			}
+		}
+		
+		if (playerBlockX <= halfWIDTH && blockX > 0 && levels[0].map[blockY * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY);
+		}
+		if (playerBlockX <= halfWIDTH && blockX > 0 && playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY - 1);
+		}
+		if (playerBlockX <= halfWIDTH && blockX > 0 && playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][(blockX - 1) * WIDTH] == undefined) {
+			addBlock(blockX - 1, blockY + 1);
+		}
+
+		if (playerBlockX > halfWIDTH && levels[0].map[blockY * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY);
+		}
+
+		if (playerBlockX > halfWIDTH && playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY - 1);
+		}
+		if (playerBlockX > halfWIDTH && playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][(blockX + 1) * WIDTH] == undefined) {
+			addBlock(blockX + 1, blockY + 1);
+		}
+		
+		if (playerBlockY <= halfHEIGHT && blockY > 0 && levels[0].map[(blockY - 1) * HEIGHT][blockX * WIDTH] == undefined) {
 			addBlock(blockX, blockY - 1);
 		}
+
+		if (playerBlockY > halfHEIGHT && levels[0].map[(blockY + 1) * HEIGHT][blockX * WIDTH] == undefined) {
+			addBlock(blockX, blockY + 1);
+		}
+
 	}
 
 	function getBlockSprite(blockType) {
@@ -371,8 +362,10 @@ $(function() {
 	function environment() {
 		var modified = [];
 
-		for (var i = levels[0].map.length; i--;) {
-			for (var j = levels[0].map[i].length; j--;) {
+		var offset = getOffset();
+
+		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
+			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 
 				var neighbourhood = [
 					((levels[0].map[i - 1] == undefined || levels[0].map[i - 1][j] == undefined) ? null : levels[0].map[i - 1][j]),
@@ -744,6 +737,9 @@ $(function() {
 			redraw();
 		});
 
+		generateMap();
+		redraw();
+
 		setInterval(
 			function() {
 				environment();
@@ -751,9 +747,6 @@ $(function() {
 			},
 			1000
 		);
-
-		generateMap();
-		redraw();
 	}
 
 	initImages(
