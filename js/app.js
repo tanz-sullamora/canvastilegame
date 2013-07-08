@@ -29,7 +29,8 @@ $(function() {
 	var player = {
 		coords: [0, 0],
 		items: {},
-		selectedItem: null
+		selectedItem: null,
+		executing: false
 	};
 
 	var placeholder = {
@@ -445,6 +446,7 @@ $(function() {
 			case 40:
 				if (canPass(player.coords[0], player.coords[1] + 1)) {
 					player.coords[1]++;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -452,6 +454,7 @@ $(function() {
 			case 39:
 				if (canPass(player.coords[0] + 1, player.coords[1])) {
 					player.coords[0]++;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -459,6 +462,7 @@ $(function() {
 			case 38:
 				if (canPass(player.coords[0], player.coords[1] - 1)) {
 					player.coords[1]--;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -466,6 +470,7 @@ $(function() {
 			case 37:
 				if (canPass(player.coords[0] - 1, player.coords[1])) {
 					player.coords[0]--;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -619,20 +624,59 @@ $(function() {
 
 
 	function execute() {
-		var interactive = {'ground': 'pit', 'rock': 'ground', 'tree': 'ground', 'water': false},
-			blockType = levels[0].map[placeholder.coords[1]][placeholder.coords[0]];
+
+		var blockType 			= levels[0].map[placeholder.coords[1]][placeholder.coords[0]],
+			blockDefenitions 	= {
+									'ground' : {
+										'duration' : 2800,
+										'animation' : function(){},
+										'opposite' : 'pit'
+									},
+									'tree' : {
+										'duration' : 800,
+										'animation' : function(){},
+										'opposite' : 'ground'
+									},
+									'rock' : {
+										'duration' : 1600,
+										'animation' : function(){},
+										'opposite' : 'ground'
+									},
+									'water' : {
+										'duration' : 200,
+										'animation' : function(){},
+										'opposite' : null
+									}
+			};
 
 		placeholder.show = false;
 
-		if (interactive[blockType] != undefined) {
+		if (blockDefenitions[blockType] != undefined) {
 			
-			log(message('execute', blockType));
+			
 
-			if (interactive[blockType] !== false) {
-				levels[0].map[placeholder.coords[1]][placeholder.coords[0]] = interactive[blockType];
-			}
+			var interactive = blockDefenitions[blockType];
 
-			pickItem(blockType);
+
+			console.log("executing....");
+			player.executing = true;
+
+			window.setTimeout(function(){
+
+				if(!player.executing) {
+					return;
+				}
+
+				if (interactive.opposite !== null) {
+					levels[0].map[placeholder.coords[1]][placeholder.coords[0]] = interactive.opposite;
+					pickItem(blockType);
+					log(message('execute', blockType));
+				}
+			}, interactive.duration);
+
+			
+
+			
 
 		} else {
 			log('Не удалось');
@@ -688,6 +732,7 @@ $(function() {
 	}
 
 	function pickItem(blockType) {
+		
 		player.items[blockType] = player.items[blockType] != undefined ? player.items[blockType] + 1 : 1;
 	}
 
