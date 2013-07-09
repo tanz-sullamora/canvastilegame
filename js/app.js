@@ -69,6 +69,42 @@ $(function() {
 				}
 			}
 		}
+
+		// рисуем берега
+		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
+			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
+				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
+					if (levels[0].map[i][j] == 'water') {
+						if (levels[0].map[i][j - 1] != undefined && levels[0].map[i][j - 1] != 'water') {
+							context.save();
+							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
+							context.rotate(1.56);
+							context.drawImage(getBlockSprite('coast'), -15, -15);
+							context.restore();
+						}
+						if (levels[0].map[i][j + 1] != undefined && levels[0].map[i][j + 1] != 'water') {
+							context.save();
+							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
+							context.rotate(4.7);
+							context.drawImage(getBlockSprite('coast'), -15, -15);
+							context.restore();
+						}
+						if (levels[0].map[i - 1] != undefined && levels[0].map[i - 1][j] != undefined && levels[0].map[i - 1][j] != 'water') {
+							context.save();
+							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
+							context.rotate(3.13);
+							context.drawImage(getBlockSprite('coast'), -15, -15);
+							context.restore();
+						}
+						if (levels[0].map[i + 1] != undefined && levels[0].map[i + 1][j] != undefined && levels[0].map[i + 1][j] != 'water') {
+							context.save();
+							context.drawImage(getBlockSprite('coast'), (j - offset[0]) * 30, (i - offset[1]) * 30);
+							context.restore();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	function generateMap() {
@@ -356,7 +392,7 @@ $(function() {
 		drawLevel();
 		drawPlayer();
 		showPlaceholder();
-		drawStatusbar();
+		// drawStatusbar();
 
 	}
 
@@ -855,6 +891,7 @@ $(function() {
 			{type: 'blackhole', source: 'img/grass.png'},
 			{type: 'pit', source: 'img/pit.png'},
 			{type: 'player', source: 'img/player.png'},
+			{type: 'coast', source: 'img/coast.png'},
 		],
 		startGame
 	);
