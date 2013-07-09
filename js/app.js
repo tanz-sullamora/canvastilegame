@@ -29,7 +29,8 @@ $(function() {
 	var player = {
 		coords: [0, 0],
 		items: {},
-		selectedItem: null
+		selectedItem: null,
+		executing: false
 	};
 
 	var placeholder = {
@@ -38,6 +39,21 @@ $(function() {
 	};
 
 	var images = {};
+
+	var drop  = {
+		'tree' : [
+			{
+				'name' : 'hueta1',
+				'droprate' : 5,
+				'title' : 'Неведомая хуета из дерева' 
+			},
+			{
+				'name' : 'hueta2',
+				'droprate' : 10,
+				'title' : 'Еще одна неведомая хуета из дерева' 
+			}
+		]
+	}
 
 	function drawLevel() {
 		var offset = getOffset();
@@ -330,7 +346,11 @@ $(function() {
 		context.textAlign = 'center';
 		context.textBaseline = 'middle';
 
-		context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
+		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
+
+		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30);
+
+
 
 	}
 	
@@ -445,6 +465,7 @@ $(function() {
 			case 40:
 				if (canPass(player.coords[0], player.coords[1] + 1)) {
 					player.coords[1]++;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -452,6 +473,7 @@ $(function() {
 			case 39:
 				if (canPass(player.coords[0] + 1, player.coords[1])) {
 					player.coords[0]++;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -459,6 +481,7 @@ $(function() {
 			case 38:
 				if (canPass(player.coords[0], player.coords[1] - 1)) {
 					player.coords[1]--;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -466,6 +489,7 @@ $(function() {
 			case 37:
 				if (canPass(player.coords[0] - 1, player.coords[1])) {
 					player.coords[0]--;
+					player.executing = false;
 					generateMap();
 				}
 			break;
@@ -619,20 +643,81 @@ $(function() {
 
 
 	function execute() {
-		var interactive = {'ground': 'pit', 'rock': 'ground', 'tree': 'ground', 'water': false},
-			blockType = levels[0].map[placeholder.coords[1]][placeholder.coords[0]];
+
+		var blockType 			= levels[0].map[placeholder.coords[1]][placeholder.coords[0]],
+			blockDefenitions 	= {
+									'ground' : {
+										'duration' : 2800,
+										'animation' : function(){},
+										'opposite' : 'pit'
+									},
+									'tree' : {
+										'duration' : 800,
+										'animation' : function(){},
+										'opposite' : 'ground'
+									},
+									'rock' : {
+										'duration' : 1600,
+										'animation' : function(){},
+										'opposite' : 'ground'
+									},
+									'water' : {
+										'duration' : 200,
+										'animation' : function(){},
+										'opposite' : null
+									}
+			};
 
 		placeholder.show = false;
 
-		if (interactive[blockType] != undefined) {
+		if (blockDefenitions[blockType] != undefined) {
 			
-			log(message('execute', blockType));
+			
 
-			if (interactive[blockType] !== false) {
-				levels[0].map[placeholder.coords[1]][placeholder.coords[0]] = interactive[blockType];
-			}
+			var interactive = blockDefenitions[blockType];
 
-			pickItem(blockType);
+
+			console.log("executing....");
+			player.executing = true;
+
+			window.setTimeout(function(){
+
+				if(!player.executing) {
+					return;
+				}
+
+				if (interactive.opposite !== null) {
+					levels[0].map[placeholder.coords[1]][placeholder.coords[0]] = interactive.opposite;
+				}
+				pickItem(blockType);
+				log(message('execute', blockType));
+				player.executing = false;
+
+				//random drop
+
+				if(drop[blockType] !== undefined) {
+
+					var dropped = false;
+					for(var i in drop[blockType]) {
+						var item = drop[blockType][i];
+
+						var rand = Math.floor(Math.random() * item.droprate + 1);
+						var dropItem = (rand == 1) ? true : false;
+
+						if(dropItem) {
+							dropped = true;
+
+							log('Воу, воу, воу! Подобрал "'+item.title+'"');
+							break;
+						}
+					}
+				}
+
+			}, interactive.duration);
+
+			
+
+			
 
 		} else {
 			log('Не удалось');
@@ -688,6 +773,7 @@ $(function() {
 	}
 
 	function pickItem(blockType) {
+		
 		player.items[blockType] = player.items[blockType] != undefined ? player.items[blockType] + 1 : 1;
 	}
 
@@ -757,7 +843,8 @@ $(function() {
 			{type: 'water', source: 'img/water.png'},
 			{type: 'bridge', source: 'img/bridge.png'},
 			{type: 'blackhole', source: 'img/grass.png'},
-			{type: 'pit', source: 'img/pit.png'}
+			{type: 'pit', source: 'img/pit.png'},
+			{type: 'player', source: 'img/player.png'},
 		],
 		startGame
 	);
