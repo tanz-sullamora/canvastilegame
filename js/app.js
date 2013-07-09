@@ -30,7 +30,8 @@ $(function() {
 		coords: [0, 0],
 		items: {},
 		selectedItem: null,
-		executing: false
+		executing: false,
+		executingTimer: null
 	};
 
 	var placeholder = {
@@ -345,20 +346,28 @@ $(function() {
 		context.fillStyle = '#000';
 		context.textAlign = 'center';
 		context.textBaseline = 'middle';
+		context.shadowColor = '#000';
+	    context.shadowBlur = 2;
+	    context.shadowOffsetX = 1;
+	    context.shadowOffsetY = 1;
 
 		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
 
 		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30 + 2, (player.coords[1] - offset[1]) * 30 + 2);
+
+		
 
 
 
 	}
 	
 	function redraw() {
+
 		drawLevel();
 		drawPlayer();
 		showPlaceholder();
 		drawStatusbar();
+
 	}
 
 	function canPass(blockX, blockY) {
@@ -466,6 +475,7 @@ $(function() {
 				if (canPass(player.coords[0], player.coords[1] + 1)) {
 					player.coords[1]++;
 					player.executing = false;
+					resetExecutingTimer();
 					generateMap();
 				}
 			break;
@@ -474,6 +484,7 @@ $(function() {
 				if (canPass(player.coords[0] + 1, player.coords[1])) {
 					player.coords[0]++;
 					player.executing = false;
+					resetExecutingTimer();
 					generateMap();
 				}
 			break;
@@ -482,6 +493,7 @@ $(function() {
 				if (canPass(player.coords[0], player.coords[1] - 1)) {
 					player.coords[1]--;
 					player.executing = false;
+					resetExecutingTimer();
 					generateMap();
 				}
 			break;
@@ -490,12 +502,15 @@ $(function() {
 				if (canPass(player.coords[0] - 1, player.coords[1])) {
 					player.coords[0]--;
 					player.executing = false;
+					resetExecutingTimer();
 					generateMap();
 				}
 			break;
 
 			case 88:
 				placeholder.show = true;
+				player.executing = false;
+				resetExecutingTimer();
 				placeholder.coords[0] = player.coords[0];
 				placeholder.coords[1] = player.coords[1];
 			break;
@@ -680,7 +695,7 @@ $(function() {
 			console.log("executing....");
 			player.executing = true;
 
-			window.setTimeout(function(){
+			player.executingTimer = window.setTimeout(function(){
 
 				if(!player.executing) {
 					return;
@@ -722,6 +737,11 @@ $(function() {
 		} else {
 			log('Не удалось');
 		}
+	}
+
+	function resetExecutingTimer() {
+		if(player.executingTimer != null)
+			clearTimeout(player.executingTimer);
 	}
 
 	function drawStatusbar() {
