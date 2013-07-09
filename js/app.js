@@ -39,7 +39,9 @@ $(function() {
 
 	var placeholder = {
 		show: false,
-		coords: [0, 0]
+		coords: [0, 0],
+		timer: null,
+		timerTimeout: null
 	};
 
 	var images = {};
@@ -101,28 +103,28 @@ $(function() {
 			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
 					if (levels[0].map[i][j] == 'water') {
-						if (levels[0].map[i][j - 1] != undefined && levels[0].map[i][j - 1] != 'water') {
+						if (levels[0].map[i][j - 1] != undefined && levels[0].map[i][j - 1] != 'water' && levels[0].map[i][j - 1] != 'bridge') {
 							context.save();
 							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
 							context.rotate(1.56);
 							context.drawImage(getBlockSprite('coast'), -15, -15);
 							context.restore();
 						}
-						if (levels[0].map[i][j + 1] != undefined && levels[0].map[i][j + 1] != 'water') {
+						if (levels[0].map[i][j + 1] != undefined && levels[0].map[i][j + 1] != 'water' && levels[0].map[i][j + 1] != 'bridge') {
 							context.save();
 							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
 							context.rotate(4.7);
 							context.drawImage(getBlockSprite('coast'), -15, -15);
 							context.restore();
 						}
-						if (levels[0].map[i - 1] != undefined && levels[0].map[i - 1][j] != undefined && levels[0].map[i - 1][j] != 'water') {
+						if (levels[0].map[i - 1] != undefined && levels[0].map[i - 1][j] != undefined && levels[0].map[i - 1][j] != 'water' && levels[0].map[i - 1][j] != 'bridge') {
 							context.save();
 							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
 							context.rotate(3.13);
 							context.drawImage(getBlockSprite('coast'), -15, -15);
 							context.restore();
 						}
-						if (levels[0].map[i + 1] != undefined && levels[0].map[i + 1][j] != undefined && levels[0].map[i + 1][j] != 'water') {
+						if (levels[0].map[i + 1] != undefined && levels[0].map[i + 1][j] != undefined && levels[0].map[i + 1][j] != 'water' && levels[0].map[i + 1][j] != 'bridge') {
 							context.save();
 							context.drawImage(getBlockSprite('coast'), (j - offset[0]) * 30, (i - offset[1]) * 30);
 							context.restore();
@@ -438,17 +440,15 @@ $(function() {
 	}
 	
 	function redraw() {
-
 		drawLevel();
 		drawPlayer();
 		showPlaceholder();
 		drawStatusbar();
 		drawNPC();
 
-		if(player.executing) {
+		if (player.executing) {
 			drawExecutionProgressBar();
 		}
-
 	}
 
 	function canPass(blockX, blockY) {
@@ -464,7 +464,8 @@ $(function() {
 		if (placeholder.show) {
 			var offset = getOffset();
 
-			context.strokeStyle = '1px dashed #ccc';
+			context.lineWidth = 0.9;
+			context.strokeStyle = '#fff';
 			context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
 		}
 	}
@@ -767,19 +768,20 @@ $(function() {
 		placeholder.show = false;
 
 		if (blockDefenitions[blockType] != undefined) {
-			
-			
-
 			var interactive = blockDefenitions[blockType];
 
-
-			console.log("executing....");
 			player.executing = true;
-			
 
+			placeholder.timerTimeout = interactive.duration;
+			drawExecutionProgressBar();
 			player.executingTimer = window.setTimeout(function(){
+				
+				placeholder.timerTimeout = null;
+				clearInterval(placeholder.timer);
+				placeholder.timer = null;
 
-				if(!player.executing) {
+				if (!player.executing) {
+					
 					return;
 				}
 
@@ -792,7 +794,7 @@ $(function() {
 
 				//random drop
 
-				if(drop[blockType] !== undefined) {
+				if (drop[blockType] !== undefined) {
 
 					var dropped = false;
 					for(var i in drop[blockType]) {
@@ -810,11 +812,8 @@ $(function() {
 					}
 				}
 
+
 			}, interactive.duration);
-
-			
-
-			
 
 		} else {
 			log('Не удалось');
@@ -822,7 +821,6 @@ $(function() {
 	}
 
 	function drawExecutionProgressBar() {
-
 		var offset = getOffset();
 
 		var x = (player.coords[0] - offset[0]) * 30 - 5;
@@ -833,8 +831,6 @@ $(function() {
 
 		var item = 'Хуячу';
 
-		
-
 		context.font = 'normal 9px sans-serif';
 		context.fillStyle = '#333';
 		context.textAlign = 'start';
@@ -843,12 +839,32 @@ $(function() {
 
 		context.textAlign = 'end';
 		
+		context.strokeStyle = '#fff';
+		context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
+
+		if (placeholder.timer == null) {
+			placeholder.timer = setInterval(
+				function() {
+					if (placeholder.timerTimeout == null) {
+						clearInterval(placeholder.timer);
+						placeholder.timer = null;
+					}
+					var width = 28 - (placeholder.timerTimeout / 100);
+					context.fillStyle = '#fff';
+					context.fillRect((placeholder.coords[0] - offset[0]) * 30 + 1, (placeholder.coords[1] - offset[1]) * 30 + 24, width, 4);
+					placeholder.timerTimeout -= 100;
+				},
+				100
+			);
+		}
 	}
 
-
 	function resetExecutingTimer() {
-		if(player.executingTimer != null)
+		if (player.executingTimer != null) {
 			clearTimeout(player.executingTimer);
+			clearInterval(placeholder.timer);
+			placeholder.timer = null;
+		}
 	}
 
 
@@ -865,8 +881,11 @@ $(function() {
 	}
 
 	function drawStatusbar() {
+		context.save();
+		context.globalAlpha = 0.5;
 		context.fillStyle = '#000';
 		context.fillRect(0, 19 * 30, 600, 30);
+		context.restore();
 
 		var item = 'Ничего не выбрано'
 
@@ -916,22 +935,6 @@ $(function() {
 		
 		player.items[blockType] = player.items[blockType] != undefined ? player.items[blockType] + 1 : 1;
 	}
-
-	// var processTimer = 0;
-	// function showProcess() {
-	// 	context.strokeStyle = '1px dashed #ccc';
-	// 	context.strokeRect(placeholder.coords[0] * 30, placeholder.coords[1] * 30, 30, 30);
-
-	// 	processTimer = setInterval(
-	// 		function() {
-
-	// 		},
-	// 		100
-	// 	);
-
-
-	// }
-
 
 	function initImages(chain, callback) {
 		if (chain.length > 0) {
