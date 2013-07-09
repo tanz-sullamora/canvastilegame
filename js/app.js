@@ -346,19 +346,9 @@ $(function() {
 		context.fillStyle = '#000';
 		context.textAlign = 'center';
 		context.textBaseline = 'middle';
-		context.shadowColor = '#000';
-	    context.shadowBlur = 2;
-	    context.shadowOffsetX = 1;
-	    context.shadowOffsetY = 1;
 
 		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
-
-		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30 + 2, (player.coords[1] - offset[1]) * 30 + 2);
-
-		
-
-
-
+		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30);
 	}
 	
 	function redraw() {
