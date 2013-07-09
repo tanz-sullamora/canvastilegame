@@ -277,7 +277,7 @@ $(function() {
 				var positions = [[0, 0], [19, 0], [19, 19], [0, 19]],
 					randomPos = Math.floor(Math.random() * positions.length);
 				
-				if (newMap[offset[1] + positions[randomPos][1]][offset[0] + positions[randomPos][0]] == 'ground') {
+				if (newMap[positions[randomPos][1]][positions[randomPos][0]] == 'ground') {
 					// get random npc
 					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
 					
