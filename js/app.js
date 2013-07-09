@@ -392,7 +392,11 @@ $(function() {
 		drawLevel();
 		drawPlayer();
 		showPlaceholder();
-		// drawStatusbar();
+		drawStatusbar();
+
+		if(player.executing) {
+			drawExecutionProgressBar();
+		}
 
 	}
 
@@ -720,6 +724,7 @@ $(function() {
 
 			console.log("executing....");
 			player.executing = true;
+			
 
 			player.executingTimer = window.setTimeout(function(){
 
@@ -764,6 +769,31 @@ $(function() {
 			log('Не удалось');
 		}
 	}
+
+	function drawExecutionProgressBar() {
+
+		var offset = getOffset();
+
+		var x = (player.coords[0] - offset[0]) * 30 - 5;
+		var y = (player.coords[1] - offset[1]) * 30 - 10;
+
+		context.fillStyle = '#fff';
+		context.fillRect(x, y, 30, 10);
+
+		var item = 'Хуячу';
+
+		
+
+		context.font = 'normal 9px sans-serif';
+		context.fillStyle = '#333';
+		context.textAlign = 'start';
+		context.textBaseline = 'middle';
+		context.fillText(item, x+2, y+4);
+
+		context.textAlign = 'end';
+		
+	}
+
 
 	function resetExecutingTimer() {
 		if(player.executingTimer != null)
