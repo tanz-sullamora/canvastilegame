@@ -10,9 +10,11 @@ $(function() {
 		{
 			title		: 'Level 1',
 			rockFactor 	: 20, // 20% камней
-			treeFactor 	: 70, // 70% леса
+			treeFactor 	: 65, // 70% леса
 			waterFactor : 10,
-			map: [ ]
+			npcFactor	: 1,
+			map 		: [ ],
+			npc 		: [ ]
 		}
 	];
 
@@ -23,7 +25,8 @@ $(function() {
 		water: 'вода',
 		bridge: 'мост',
 		blackhole: 'чёрная дыра',
-		pit: 'яма'
+		pit: 'яма',
+		npc: 'NPC'
 	};
 
 	var player = {
@@ -42,6 +45,29 @@ $(function() {
 	};
 
 	var images = {};
+
+	var npc = [
+		{
+			type 			: 'npc_green',
+			aggressive 		: false,
+			coords 			: [0, 0]
+		},
+		{
+			type 			: 'npc_blue',
+			aggressive  	: false,
+			coords 			: [0, 0]
+		},
+		{
+			type 			: 'npc_red',
+			aggressive 		: true,
+			coords 			: [0, 0]
+		},
+		{
+			type 			: 'npc_yellow',
+			aggressive 		: true,
+			coords 			: [0, 0]
+		}
+	];
 
 	var drop  = {
 		'tree' : [
@@ -122,10 +148,14 @@ $(function() {
 			var maxItemsCount = HEIGHT * WIDTH;
 
 			var rockFactor = levels[0].rockFactor;
-			var treeFactor = levels[0].treeFactor
+			var treeFactor = levels[0].treeFactor;
+			var npcFactor  = levels[0].npcFactor;
 			
-			var treeCount =  Math.floor(maxItemsCount * (Math.random() * treeFactor) / 100);
-			var rockCount =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
+			var treeCount  =  Math.floor(maxItemsCount * (Math.random() * treeFactor) / 100);
+			var rockCount  =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
+			var npcCount   =  Math.floor((maxItemsCount - treeCount - rockCount) * (Math.random() * npcFactor) / 100);
+
+			console.log(npcCount);
 
 			/* камни */
 			for (var i = rockCount; i--;) {
@@ -234,6 +264,26 @@ $(function() {
 			}
 
 			newMap = drawRivers(newMap, waterSources);
+
+
+			// NPC
+
+			for (var i = npcCount; i--;) {
+				
+				var y = Math.floor(Math.random() * HEIGHT);
+				var x = Math.floor(Math.random() * WIDTH)
+				
+				if(newMap[y][x] == 'ground') {
+
+					// get random npc
+					var npcItem = npc[Math.floor(Math.random() * npc.length)];	
+					
+					npcItem.coords = [y, x];
+					levels[0].npc.push(npcItem);
+					//newMap[y][x] = npcItem.type;
+				}
+			}
+
 
 			return newMap;
 		}
@@ -394,6 +444,7 @@ $(function() {
 		drawPlayer();
 		showPlaceholder();
 		drawStatusbar();
+		drawNPC();
 
 		if (player.executing) {
 			drawExecutionProgressBar();
@@ -816,6 +867,19 @@ $(function() {
 		}
 	}
 
+
+	function drawNPC() {
+		
+		var offset = getOffset();
+		for(var i in levels[0].npc) {
+			var currentNpc = levels[0].npc[i];
+
+			context.drawImage(getBlockSprite(currentNpc.type), (currentNpc.coords[0] - offset[0]) * 30, (currentNpc.coords[1] - offset[1]) * 30);
+
+		}
+		
+	}
+
 	function drawStatusbar() {
 		context.save();
 		context.globalAlpha = 0.5;
@@ -916,15 +980,19 @@ $(function() {
 
 	initImages(
 		[
-			{type: 'ground', source: 'img/grass.png'},
-			{type: 'rock', source: 'img/stone.png'},
-			{type: 'tree', source: 'img/tree.png'},
-			{type: 'water', source: 'img/water.png'},
-			{type: 'bridge', source: 'img/bridge.png'},
-			{type: 'blackhole', source: 'img/grass.png'},
-			{type: 'pit', source: 'img/pit.png'},
-			{type: 'player', source: 'img/player.png'},
-			{type: 'coast', source: 'img/coast.png'},
+			{type: 'ground', 		source: 'img/grass.png'					},
+			{type: 'rock', 			source: 'img/stone.png'					},
+			{type: 'tree', 			source: 'img/tree.png'					},
+			{type: 'water', 		source: 'img/water.png'					},
+			{type: 'bridge', 		source: 'img/bridge.png'				},
+			{type: 'blackhole', 	source: 'img/grass.png'					},
+			{type: 'pit', 			source: 'img/pit.png'					},
+			{type: 'player', 		source: 'img/player.png'				},
+			{type: 'coast', 		source: 'img/coast.png'					},
+			{type: 'npc_blue', 		source: 'img/blue_monster.png'			},
+			{type: 'npc_green', 	source: 'img/green_monster.png'			},
+			{type: 'npc_red', 		source: 'img/red_monster_angry.png'		},
+			{type: 'npc_yellow', 	source: 'img/yellow_monster_angry.png'	},
 		],
 		startGame
 	);
