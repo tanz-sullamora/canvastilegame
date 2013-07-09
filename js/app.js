@@ -46,7 +46,7 @@ $(function() {
 
 	var images = {};
 
-	var npc = [
+	var npcs = [
 		{
 			type 			: 'npc_green',
 			aggressive 		: false,
@@ -67,6 +67,16 @@ $(function() {
 			aggressive 		: true,
 			coords 			: [0, 0]
 		}
+	];
+
+	var npcSpeech = [
+		{ text: "Я твой дом труба шатал", len: 120 },
+		{ text: "Анус себе дерни, пес!", len: 110 },
+		{ text: "Да ты хуй простой", len: 90 },
+		{ text: "Слышь, семки есть?", len: 100 },
+		{ text: "А если найду?", len: 70 },
+		{ text: "Все, пизда тебе!!!", len: 90 },
+		{ text: "СУКА!!!11 ААА!!!111", len: 90 }
 	];
 
 	var drop  = {
@@ -276,7 +286,7 @@ $(function() {
 				if(newMap[y][x] == 'ground') {
 
 					// get random npc
-					var npcItem = npc[Math.floor(Math.random() * npc.length)];	
+					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
 					
 					npcItem.coords = [y, x];
 					levels[0].npc.push(npcItem);
@@ -287,6 +297,8 @@ $(function() {
 
 			return newMap;
 		}
+
+		
 
 		function drawForest(map, count, x, y) {
 			for (var i = count; i--;) {
@@ -835,7 +847,7 @@ $(function() {
 		context.fillStyle = '#333';
 		context.textAlign = 'start';
 		context.textBaseline = 'middle';
-		context.fillText(item, x+2, y+4);
+		context.fillText(item, x+2, y+5);
 
 		context.textAlign = 'end';
 		
@@ -859,6 +871,34 @@ $(function() {
 		}
 	}
 
+
+	function drawNpcSpeech(npc) {
+
+		var offset = getOffset();
+		var item = npcSpeech[Math.floor(Math.random() * npcSpeech.length)];
+
+		var x = (npc.coords[0] - offset[0]) * 30 - 5;
+		var y = (npc.coords[1] - offset[1]) * 30 - 10;
+
+		context.fillStyle = '#fff';
+		context.fillRect(x, y, item.len, 10);
+
+		
+
+		context.font = 'normal 9px sans-serif';
+		context.fillStyle = '#333';
+		context.textAlign = 'start';
+		context.textBaseline = 'middle';
+		context.fillText(item.text, x+2, y+5);
+
+		context.textAlign = 'end';
+		
+		context.strokeStyle = '#fff';
+		
+		
+	}
+
+
 	function resetExecutingTimer() {
 		if (player.executingTimer != null) {
 			clearTimeout(player.executingTimer);
@@ -867,12 +907,54 @@ $(function() {
 		}
 	}
 
+	function moveNpc(npc) {
+
+		var x 			= npc.coords[0];
+		var y 			= npc.coords[1];
+		var direction 	= Math.round(Math.random() * 4);
+
+		switch (direction) {
+		   	case 0: 
+		    	y--;
+		   		break;
+		   	case 1: 
+		    	x++;
+		   		break;
+		   	case 2: 
+		   	 	y++;
+		   		break;
+		    case 3: 
+		    	x--;
+		   		break;
+		}
+
+
+		if (levels[0].map[y] != undefined && levels[0].map[y][x] != undefined && levels[0].map[y][x] == 'ground') {
+	   		npc.coords = [x, y];
+	 	}
+
+	 	return npc;
+
+	}
+
 
 	function drawNPC() {
 		
 		var offset = getOffset();
 		for(var i in levels[0].npc) {
-			var currentNpc = levels[0].npc[i];
+
+
+			var currentNpc 	= levels[0].npc[i];
+			var needMove 	= (Math.floor(Math.random() * 2) + 1 == 1)  ? true : false; 
+			if(needMove) {
+				currentNpc 	= moveNpc(currentNpc);
+			}
+			
+			var needTalk 	= (Math.floor(Math.random() * 5 + 1) == 1)  ? true : false; 
+
+			if(needTalk) {
+				drawNpcSpeech(currentNpc);
+			}
 
 			context.drawImage(getBlockSprite(currentNpc.type), (currentNpc.coords[0] - offset[0]) * 30, (currentNpc.coords[1] - offset[1]) * 30);
 
