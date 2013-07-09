@@ -346,11 +346,7 @@ $(function() {
 		context.fillStyle = '#000';
 		context.textAlign = 'center';
 		context.textBaseline = 'middle';
-		context.shadowColor = '#000';
-	    context.shadowBlur = 2;
-	    context.shadowOffsetX = 1;
-	    context.shadowOffsetY = 1;
-
+		
 		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
 
 		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30);
@@ -367,6 +363,10 @@ $(function() {
 		drawPlayer();
 		showPlaceholder();
 		drawStatusbar();
+
+		if(player.executing) {
+			drawExecutionProgressBar();
+		}
 
 	}
 
@@ -694,6 +694,7 @@ $(function() {
 
 			console.log("executing....");
 			player.executing = true;
+			
 
 			player.executingTimer = window.setTimeout(function(){
 
@@ -738,6 +739,31 @@ $(function() {
 			log('Не удалось');
 		}
 	}
+
+	function drawExecutionProgressBar() {
+
+		var offset = getOffset();
+
+		var x = placeholder.coords[0] * 30 - 15;
+		var y = placeholder.coords[1] * 30 - 10;
+
+		context.fillStyle = '#fff';
+		context.fillRect(x, y, 30, 10);
+
+		var item = 'Хуячу';
+
+		
+
+		context.font = 'normal 9px sans-serif';
+		context.fillStyle = '#333';
+		context.textAlign = 'start';
+		context.textBaseline = 'middle';
+		context.fillText(item, x+2, y+4);
+
+		context.textAlign = 'end';
+		
+	}
+
 
 	function resetExecutingTimer() {
 		if(player.executingTimer != null)
