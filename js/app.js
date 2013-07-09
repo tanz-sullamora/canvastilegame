@@ -816,8 +816,11 @@ $(function() {
 	}
 
 	function drawStatusbar() {
+		context.save();
+		context.globalAlpha = 0.5;
 		context.fillStyle = '#000';
 		context.fillRect(0, 19 * 30, 600, 30);
+		context.restore();
 
 		var item = 'Ничего не выбрано'
 
