@@ -825,22 +825,6 @@ $(function() {
 	function drawExecutionProgressBar() {
 		var offset = getOffset();
 
-		var x = (player.coords[0] - offset[0]) * 30 - 5;
-		var y = (player.coords[1] - offset[1]) * 30 - 10;
-
-		context.fillStyle = '#fff';
-		context.fillRect(x, y, 30, 10);
-
-		var item = 'Хуячу';
-
-		context.font = 'normal 9px sans-serif';
-		context.fillStyle = '#333';
-		context.textAlign = 'start';
-		context.textBaseline = 'middle';
-		context.fillText(item, x+2, y+5);
-
-		context.textAlign = 'end';
-		
 		context.strokeStyle = '#fff';
 		context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
 
