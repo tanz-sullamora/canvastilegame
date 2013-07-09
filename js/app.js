@@ -413,7 +413,8 @@ $(function() {
 		if (placeholder.show) {
 			var offset = getOffset();
 
-			context.strokeStyle = '1px dashed #ccc';
+			context.lineWidth = 0.9;
+			context.strokeStyle = '#fff';
 			context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
 		}
 	}
@@ -787,8 +788,8 @@ $(function() {
 
 		context.textAlign = 'end';
 		
-		context.strokeStyle = '#ccc';
-		context.strokeRect((player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30, 30, 30);
+		context.strokeStyle = '#fff';
+		context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
 
 		if (placeholder.timer == null) {
 			placeholder.timer = setInterval(
@@ -799,7 +800,7 @@ $(function() {
 					}
 					var width = 28 - (placeholder.timerTimeout / 100);
 					context.fillStyle = '#fff';
-					context.fillRect((player.coords[0] - offset[0]) * 30 + 1, (player.coords[1] - offset[1]) * 30 + 24, width, 4);
+					context.fillRect((placeholder.coords[0] - offset[0]) * 30 + 1, (placeholder.coords[1] - offset[1]) * 30 + 24, width, 4);
 					placeholder.timerTimeout -= 100;
 				},
 				100
