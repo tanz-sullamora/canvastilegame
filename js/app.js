@@ -744,8 +744,8 @@ $(function() {
 
 		var offset = getOffset();
 
-		var x = placeholder.coords[0] * 30 - 15;
-		var y = placeholder.coords[1] * 30 - 10;
+		var x = (placeholder.coords[0] - offset[0]) * 30 - 15;
+		var y = (placeholder.coords[1] - offset[1]) * 30 - 10;
 
 		context.fillStyle = '#fff';
 		context.fillRect(x, y, 30, 10);
