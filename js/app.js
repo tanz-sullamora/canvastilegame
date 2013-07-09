@@ -277,14 +277,13 @@ $(function() {
 				var positions = [[0, 0], [19, 0], [19, 19], [0, 19]],
 					randomPos = Math.floor(Math.random() * positions.length);
 				
-				if (newMap[y][x] == 'ground') {
+				if (newMap[offset[1] + positions[randomPos][1]][offset[0] + positions[randomPos][0]] == 'ground') {
 					// get random npc
 					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
 					
 					npcItem.name = NPCsNames[1][Math.floor(Math.random() * NPCsNames[1].length)] + ' ' + NPCsNames[0][Math.floor(Math.random() * NPCsNames[0].length)];
 					npcItem.coords = [offset[0] + positions[randomPos][0], offset[1] + positions[randomPos][1]];
 					levels[0].npc.push(npcItem);
-					//newMap[y][x] = npcItem.type;
 				}
 			}
 			initNPCs();
@@ -912,7 +911,7 @@ $(function() {
 			break;
 		}
 
-		if (levels[0].map[y] != undefined && levels[0].map[y][x] != undefined && levels[0].map[y][x] == 'ground') {
+		if (levels[0].map[y] != undefined && levels[0].map[y][x] != undefined && (levels[0].map[y][x] == 'ground' || levels[0].map[y][x] == 'bridge')) {
 	   		return [x, y];
 	 	}
 
