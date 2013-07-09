@@ -36,7 +36,9 @@ $(function() {
 
 	var placeholder = {
 		show: false,
-		coords: [0, 0]
+		coords: [0, 0],
+		timer: null,
+		timerTimeout: null
 	};
 
 	var images = {};
@@ -388,16 +390,14 @@ $(function() {
 	}
 	
 	function redraw() {
-
 		drawLevel();
 		drawPlayer();
 		showPlaceholder();
 		drawStatusbar();
 
-		if(player.executing) {
+		if (player.executing) {
 			drawExecutionProgressBar();
 		}
-
 	}
 
 	function canPass(blockX, blockY) {
@@ -716,19 +716,20 @@ $(function() {
 		placeholder.show = false;
 
 		if (blockDefenitions[blockType] != undefined) {
-			
-			
-
 			var interactive = blockDefenitions[blockType];
 
-
-			console.log("executing....");
 			player.executing = true;
-			
 
+			placeholder.timerTimeout = interactive.duration;
+			drawExecutionProgressBar();
 			player.executingTimer = window.setTimeout(function(){
+				
+				placeholder.timerTimeout = null;
+				clearInterval(placeholder.timer);
+				placeholder.timer = null;
 
-				if(!player.executing) {
+				if (!player.executing) {
+					
 					return;
 				}
 
@@ -741,7 +742,7 @@ $(function() {
 
 				//random drop
 
-				if(drop[blockType] !== undefined) {
+				if (drop[blockType] !== undefined) {
 
 					var dropped = false;
 					for(var i in drop[blockType]) {
@@ -759,11 +760,8 @@ $(function() {
 					}
 				}
 
+
 			}, interactive.duration);
-
-			
-
-			
 
 		} else {
 			log('Не удалось');
@@ -771,7 +769,6 @@ $(function() {
 	}
 
 	function drawExecutionProgressBar() {
-
 		var offset = getOffset();
 
 		var x = (player.coords[0] - offset[0]) * 30 - 5;
@@ -782,8 +779,6 @@ $(function() {
 
 		var item = 'Хуячу';
 
-		
-
 		context.font = 'normal 9px sans-serif';
 		context.fillStyle = '#333';
 		context.textAlign = 'start';
@@ -792,12 +787,32 @@ $(function() {
 
 		context.textAlign = 'end';
 		
+		context.strokeStyle = '#ccc';
+		context.strokeRect((player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30, 30, 30);
+
+		if (placeholder.timer == null) {
+			placeholder.timer = setInterval(
+				function() {
+					if (placeholder.timerTimeout == null) {
+						clearInterval(placeholder.timer);
+						placeholder.timer = null;
+					}
+					var width = 28 - (placeholder.timerTimeout / 100);
+					context.fillStyle = '#fff';
+					context.fillRect((player.coords[0] - offset[0]) * 30 + 1, (player.coords[1] - offset[1]) * 30 + 24, width, 4);
+					placeholder.timerTimeout -= 100;
+				},
+				100
+			);
+		}
 	}
 
-
 	function resetExecutingTimer() {
-		if(player.executingTimer != null)
+		if (player.executingTimer != null) {
 			clearTimeout(player.executingTimer);
+			clearInterval(placeholder.timer);
+			placeholder.timer = null;
+		}
 	}
 
 	function drawStatusbar() {
@@ -852,22 +867,6 @@ $(function() {
 		
 		player.items[blockType] = player.items[blockType] != undefined ? player.items[blockType] + 1 : 1;
 	}
-
-	// var processTimer = 0;
-	// function showProcess() {
-	// 	context.strokeStyle = '1px dashed #ccc';
-	// 	context.strokeRect(placeholder.coords[0] * 30, placeholder.coords[1] * 30, 30, 30);
-
-	// 	processTimer = setInterval(
-	// 		function() {
-
-	// 		},
-	// 		100
-	// 	);
-
-
-	// }
-
 
 	function initImages(chain, callback) {
 		if (chain.length > 0) {
