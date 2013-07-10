@@ -105,7 +105,13 @@ $(function() {
 		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
 			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
-					context.drawImage(getBlockSprite(levels[0].map[i][j]), (j - offset[0]) * 30, (i - offset[1]) * 30);
+					if (levels[0].map[i][j] == 'ground') {
+						var spriteCode = (i + j).toString(),
+							coastSprite = [0, 1, 2, 1, 1, 2, 1, 2, 0, 0][spriteCode[spriteCode.length - 1]];
+						context.drawImage(getBlockSprite(levels[0].map[i][j]), coastSprite * 30, 0, 30, 30, (j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
+					} else {
+						context.drawImage(getBlockSprite(levels[0].map[i][j]), (j - offset[0]) * 30, (i - offset[1]) * 30);
+					}
 				} else {
 					context.fillStyle = '#000';
 					context.fillRect((j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
@@ -118,9 +124,9 @@ $(function() {
 			context.translate(translate[0], translate[1]);
 			context.rotate(rotate);
 			// устойчивый спрайт, зависящий от координат, для того чтобы берег не менялся при перерисовке
-			// var spriteCode = (Number(coords[0]) + Number(coords[1])).toString(),
-				// coastSprite = [4, 1, 2, 3, 4, 0, 1, 2, 3, 0][spriteCode[spriteCode.length - 1]];
-			var	coastSprite = Math.round((coords[0] + coords[1]) % 4);
+			var spriteCode = (coords[1] + coords[0]).toString(),
+				coastSprite = [0, 1, 2, 3, 4, 4, 3, 2, 1, 0][spriteCode[spriteCode.length - 1]];
+			// var	coastSprite = Math.round((coords[0] + coords[1]) % 4);
 
 			context.drawImage(getBlockSprite('coast'), coastSprite * 30, 0, 30, 30, -15, -15, 30, 30);
 			context.restore();
