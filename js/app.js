@@ -105,13 +105,9 @@ $(function() {
 		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
 			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
-					if (levels[0].map[i][j] == 'ground') {
-						var spriteCode = (i + j).toString(),
-							coastSprite = [0, 1, 2, 1, 1, 2, 1, 2, 0, 0][spriteCode[spriteCode.length - 1]];
-						context.drawImage(getBlockSprite(levels[0].map[i][j]), coastSprite * 30, 0, 30, 30, (j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
-					} else {
-						context.drawImage(getBlockSprite(levels[0].map[i][j]), (j - offset[0]) * 30, (i - offset[1]) * 30);
-					}
+					var	blockSprite = getBlockSprite(levels[0].map[i][j]),
+						sprite = Math.floor((i + j * 1.71) % blockSprite.count);
+					context.drawImage(blockSprite, sprite * 30, 0, 30, 30, (j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
 				} else {
 					context.fillStyle = '#000';
 					context.fillRect((j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
@@ -124,11 +120,10 @@ $(function() {
 			context.translate(translate[0], translate[1]);
 			context.rotate(rotate);
 			// устойчивый спрайт, зависящий от координат, для того чтобы берег не менялся при перерисовке
-			var spriteCode = (coords[1] + coords[0]).toString(),
-				coastSprite = [0, 1, 2, 3, 4, 4, 3, 2, 1, 0][spriteCode[spriteCode.length - 1]];
-			// var	coastSprite = Math.round((coords[0] + coords[1]) % 4);
+			var	coastSprite = getBlockSprite('coast'),
+				sprite = Math.floor((coords[0] + coords[1]) % coastSprite.count);
 
-			context.drawImage(getBlockSprite('coast'), coastSprite * 30, 0, 30, 30, -15, -15, 30, 30);
+			context.drawImage(coastSprite, sprite * 30, 0, 30, 30, -15, -15, 30, 30);
 			context.restore();
 		}
 
@@ -1047,6 +1042,7 @@ $(function() {
 				initImages(chain, callback);
 			}
 			images[sprite.type].src = sprite.source;
+			images[sprite.type].count = sprite.count;
 
 		} else {
 			callback();
@@ -1091,19 +1087,19 @@ $(function() {
 
 	initImages(
 		[
-			{type: 'ground', 		source: 'img/grass.png'					},
-			{type: 'rock', 			source: 'img/stone.png'					},
-			{type: 'tree', 			source: 'img/tree.png'					},
-			{type: 'water', 		source: 'img/water.png'					},
-			{type: 'bridge', 		source: 'img/bridge.png'				},
-			{type: 'blackhole', 	source: 'img/grass.png'					},
-			{type: 'pit', 			source: 'img/pit.png'					},
-			{type: 'player', 		source: 'img/player.png'				},
-			{type: 'coast', 		source: 'img/coast.png'					},
-			{type: 'npc_blue', 		source: 'img/blue_monster.png'			},
-			{type: 'npc_green', 	source: 'img/green_monster.png'			},
-			{type: 'npc_red', 		source: 'img/red_monster_angry.png'		},
-			{type: 'npc_yellow', 	source: 'img/yellow_monster_angry.png'	},
+			{type: 'ground', source: 'img/grass.png', count: 5},
+			{type: 'rock', source: 'img/stone.png', count: 3},
+			{type: 'tree', source: 'img/tree.png', count: 2},
+			{type: 'water', source: 'img/water.png', count: 2},
+			{type: 'bridge', source: 'img/bridge.png', count: 1},
+			{type: 'blackhole', source: 'img/grass.png', count: 1},
+			{type: 'pit', source: 'img/pit.png', count: 1},
+			{type: 'player', source: 'img/player.png', count: 1},
+			{type: 'coast', source: 'img/coast.png', count: 5},
+			{type: 'npc_blue', source: 'img/blue_monster.png', count: 1},
+			{type: 'npc_green', source: 'img/green_monster.png', count: 1},
+			{type: 'npc_red', source: 'img/red_monster_angry.png', count: 1},
+			{type: 'npc_yellow', source: 'img/yellow_monster_angry.png', count: 1},
 		],
 		startGame
 	);
