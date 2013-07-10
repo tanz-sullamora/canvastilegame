@@ -113,37 +113,49 @@ $(function() {
 			}
 		}
 
+		function drawCoast(translate, rotate, coords) {
+			context.save();
+			context.translate(translate[0], translate[1]);
+			context.rotate(rotate);
+			// устойчивый спрайт, зависящий от координат, для того чтобы берег не менялся при перерисовке
+			// var spriteCode = (Number(coords[0]) + Number(coords[1])).toString(),
+				// coastSprite = [4, 1, 2, 3, 4, 0, 1, 2, 3, 0][spriteCode[spriteCode.length - 1]];
+			var	coastSprite = Math.round((coords[0] + coords[1]) % 4);
+
+			context.drawImage(getBlockSprite('coast'), coastSprite * 30, 0, 30, 30, -15, -15, 30, 30);
+			context.restore();
+		}
+
 		// рисуем берега
 		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
 			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
 					if (levels[0].map[i][j] == 'water') {
+						var translate = [0, 0],
+							rotate = 0,
+							coords = [-15, -15];
+
 						if (levels[0].map[i][j - 1] != undefined && levels[0].map[i][j - 1] != 'water' && levels[0].map[i][j - 1] != 'bridge') {
-							context.save();
-							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
-							context.rotate(1.56);
-							context.drawImage(getBlockSprite('coast'), -15, -15);
-							context.restore();
+							translate = [(j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15];
+							rotate = 1.56;
+							drawCoast(translate, rotate, [j - 1, i]);
 						}
 						if (levels[0].map[i][j + 1] != undefined && levels[0].map[i][j + 1] != 'water' && levels[0].map[i][j + 1] != 'bridge') {
-							context.save();
-							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
-							context.rotate(4.7);
-							context.drawImage(getBlockSprite('coast'), -15, -15);
-							context.restore();
+							translate = [(j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15];
+							rotate = 4.7;
+							drawCoast(translate, rotate, [j + 1, i]);
 						}
 						if (levels[0].map[i - 1] != undefined && levels[0].map[i - 1][j] != undefined && levels[0].map[i - 1][j] != 'water' && levels[0].map[i - 1][j] != 'bridge') {
-							context.save();
-							context.translate((j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15);
-							context.rotate(3.13);
-							context.drawImage(getBlockSprite('coast'), -15, -15);
-							context.restore();
+							translate = [(j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15];
+							rotate = 3.13;
+							drawCoast(translate, rotate, [j, i - 1]);
 						}
 						if (levels[0].map[i + 1] != undefined && levels[0].map[i + 1][j] != undefined && levels[0].map[i + 1][j] != 'water' && levels[0].map[i + 1][j] != 'bridge') {
-							context.save();
-							context.drawImage(getBlockSprite('coast'), (j - offset[0]) * 30, (i - offset[1]) * 30);
-							context.restore();
+							translate = [(j - offset[0]) * 30 + 15, (i - offset[1]) * 30 + 15];
+							rotate = 0;
+							drawCoast(translate, rotate, [j, i + 1]);
 						}
+					
 					}
 				}
 			}
@@ -763,7 +775,7 @@ $(function() {
 									'water' : {
 										'duration' : 200,
 										'animation' : function(){},
-										'opposite' : null
+										'opposite' : 'pit'
 									}
 			};
 
