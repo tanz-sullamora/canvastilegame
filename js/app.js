@@ -70,13 +70,36 @@ $(function() {
 	];
 
 	var npcSpeech = [
-		{ text: "Я твой дом труба шатал", len: 120 },
-		{ text: "Анус себе дерни, пес!", len: 110 },
-		{ text: "Да ты хуй простой", len: 90 },
-		{ text: "Слышь, семки есть?", len: 100 },
-		{ text: "А если найду?", len: 70 },
-		{ text: "Все, пизда тебе!!!", len: 90 },
-		{ text: "СУКА!!!11 ААА!!!111", len: 90 }
+		'Пристрелите меня, кто-нибудь',
+		'Не подскажете, как пройти до библиотеки?',
+		'Да у тебя и зубы золотые!',
+		'Бежевый! Я покрашу потолок в бежевый!',
+		'Проходит как-то ирландец мимо бара...',
+		'Иногда сигара - это просто сигара',
+		'Был у меня один кореш, не употреблял ничего',
+		'Эх, а вот в наше время...',
+		'Всё вокруг кажется мне плоским',
+		'На самом деле я доктор honoris causa',
+		'Поговорим о нарративе?',
+		'Кажется, я отравился печенькой',
+		'*Посвистывает*',
+		'*Громко стонет*',
+		'*Озирается вокруг*',
+		'Уважаемый сэр или мадам, подайте голодающему организму',
+		'Запость это в твиттер',
+		'Отступать некуда, за нами 2D',
+		'Позвольте, я почитаю вам Бродского?',
+		'Ваши пальцы пахнут ладаном...',
+		'*Напевает*',
+		'Кажется, я заблудился',
+		'Разрешите вас проводить?',
+		'Какой длины впп в Испании?',
+		'Лошадкаааа!!!',
+		'Мы ещё встретимся',
+		'В детстве меня звали "Кусок кода"',
+		'На днях открыл свой стартап',
+		'Java для лохов',
+		'Занимайтесь любовью, а не игрой',
 	];
 	
 	var NPCsNames = [
@@ -858,29 +881,6 @@ $(function() {
 		}
 	}
 
-
-	function drawNpcSpeech(npc) {
-		var offset = getOffset();
-		var item = npcSpeech[Math.floor(Math.random() * npcSpeech.length)];
-
-		var x = (npc.coords[0] - offset[0]) * 30 - 5;
-		var y = (npc.coords[1] - offset[1]) * 30 - 10;
-
-		context.fillStyle = '#fff';
-		context.fillRect(x, y, item.len, 10);
-
-		context.font = 'normal 9px sans-serif';
-		context.fillStyle = '#333';
-		context.textAlign = 'start';
-		context.textBaseline = 'middle';
-		context.fillText(item.text, x+2, y+5);
-
-		context.textAlign = 'end';
-		
-		context.strokeStyle = '#fff';
-	}
-
-
 	function resetExecutingTimer() {
 		if (player.executingTimer != null) {
 			clearTimeout(player.executingTimer);
@@ -916,8 +916,37 @@ $(function() {
 	}
 
 
+	function drawMultiLine(phrase, x, y, maxWidth, lineHeight, reverse) {
+		var words = phrase.split(' '),
+			top = y,
+			line = '',
+			width = 0;
+
+		for (var i = 0; i < words.length; i += 1) {
+			var testLine = line + words[i] + ' ', 
+				testWidth = context.measureText(testLine).width;
+
+			if (testWidth > maxWidth) {
+				context.fillText(line, x, top);
+				line = words[i] + ' ';
+				if (!reverse) {
+					top -= lineHeight;
+				} else {
+					top += lineHeight;
+				}
+			} else {
+				line = testLine;
+				width = testWidth > width ? testWidth : width;
+			}
+		}
+
+		context.fillText(line, x, top);
+		return [width, y - top + lineHeight ];
+	}
+
 	function drawNPC() {
-		var offset = getOffset();
+		var offset = getOffset(),
+			textWidth = 110;
 
 		for (var i = levels[0].npc.length; i--; ) {
 			var currentNPC = levels[0].npc[i],
@@ -932,11 +961,18 @@ $(function() {
 			context.fillText(currentNPC.name, x + 15, y + 30);
 			
 			if (currentNPC.needTalk) {
-				context.fillRect(x, y, currentNPC.talkPhrase.len, 10);
-				context.fillStyle = '#333';
+				context.font = 'normal 9px sans-serif';
 				context.textAlign = 'start';
-				context.textBaseline = 'middle';
-				context.fillText(currentNPC.talkPhrase.text, x - 3, y + 5);
+				context.textBaseline = 'top';
+
+				context.fillStyle = 'transparent';
+				var pos = drawMultiLine(currentNPC.talkPhrase, x + 2, y + 2, textWidth, 9 + 3);
+				context.fillStyle = '#fff';
+				context.fillRect(x, y - pos[1], pos[0] + 6, pos[1] + 3);
+
+				context.font = 'normal 9px sans-serif';
+				context.fillStyle = '#000';
+				drawMultiLine(currentNPC.talkPhrase, x + 3, y + 2 - pos[1], textWidth, 9 + 3, true);
 			}
 		}
 	}
@@ -965,7 +1001,7 @@ $(function() {
 											self.needTalk = false;
 											self.talkTimeout = undefined;
 										},
-										1000
+										2000
 									);
 								}
 							}
