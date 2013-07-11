@@ -4,7 +4,14 @@ $(function() {
 		HEIGHT = 20;
 
 	var canvasElement = $('#cnv'),
-		context = canvasElement[0].getContext('2d');
+		trueContext = canvasElement[0].getContext('2d'),
+		placeholderElement = $('<canvas width="30" height="30" style="position: absolute" />').appendTo('body'),
+		placeholderContext = placeholderElement[0].getContext('2d'),
+		buffer = document.createElement('canvas'),
+		context = buffer.getContext('2d');
+
+	buffer.width  = 600;
+	buffer.height = 600;
 
 	var levels = [
 		{
@@ -480,13 +487,10 @@ $(function() {
 	function redraw() {
 		drawLevel();
 		drawPlayer();
-		showPlaceholder();
 		drawStatusbar();
 		drawNPC();
 
-		if (player.executing) {
-			drawExecutionProgressBar();
-		}
+		trueContext.drawImage(buffer, 0, 0);
 	}
 
 	function canPass(blockX, blockY) {
@@ -502,9 +506,11 @@ $(function() {
 		if (placeholder.show) {
 			var offset = getOffset();
 
-			context.lineWidth = 0.9;
-			context.strokeStyle = '#fff';
-			context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
+			placeholderContext.clearRect(0, 0, 30, 30);
+			placeholderContext.lineWidth = 0.9;
+			placeholderContext.strokeStyle = '#fff';
+			placeholderContext.strokeRect(0, 0, 30, 30);
+			placeholderElement.css({left: canvasElement.offset().left + (placeholder.coords[0] - offset[0]) * 30, top: canvasElement.offset().top + (placeholder.coords[1] - offset[1]) * 30})
 		}
 	}
 
@@ -628,11 +634,14 @@ $(function() {
 			break;
 
 			case 88:
-				placeholder.show = true;
 				player.executing = false;
 				resetExecutingTimer();
 				placeholder.coords[0] = player.coords[0];
 				placeholder.coords[1] = player.coords[1];
+
+				placeholder.show = true;
+				placeholderElement.show();
+				showPlaceholder();
 			break;
 
 			default:
@@ -647,7 +656,12 @@ $(function() {
 
 	function processPlaceholder(button) {
 		var deltaX = placeholder.coords[0] - player.coords[0],
-			deltaY = placeholder.coords[1] - player.coords[1];
+			deltaY = placeholder.coords[1] - player.coords[1],
+			offset = getOffset();
+
+		if (player.executing) {
+			resetExecutingTimer();
+		}
 
 		switch (button) {
 			case 40:
@@ -676,6 +690,7 @@ $(function() {
 
 			case 88:
 				placeholder.show = false;
+				placeholderElement.hide();
 			break;
 
 			case 13:
@@ -690,10 +705,12 @@ $(function() {
 				console.log(button);
 			break;
 		}
+		placeholderElement.css({left: canvasElement.offset().left + (placeholder.coords[0] - offset[0]) * 30, top: canvasElement.offset().top + (placeholder.coords[1] - offset[1]) * 30});
 	}
 
 	function putDown() {
 		placeholder.show = false;
+		placeholderElement.hide();
 		if (player.selectedItem != null) {
 			var interactive = {
 								'ground': {'rock': 'rock', 'tree': 'tree'},
@@ -813,15 +830,6 @@ $(function() {
 			placeholder.timerTimeout = interactive.duration;
 			drawExecutionProgressBar();
 			player.executingTimer = window.setTimeout(function(){
-				
-				placeholder.timerTimeout = null;
-				clearInterval(placeholder.timer);
-				placeholder.timer = null;
-
-				if (!player.executing) {
-					
-					return;
-				}
 
 				if (interactive.opposite !== null) {
 					levels[0].map[placeholder.coords[1]][placeholder.coords[0]] = interactive.opposite;
@@ -849,31 +857,40 @@ $(function() {
 						}
 					}
 				}
+				
+				resetExecutingTimer();
 
+				if (!player.executing) {
+					return;
+				}
 
 			}, interactive.duration);
 
 		} else {
 			log('Не удалось');
+			placeholder.show = false;
+			placeholderElement.hide();
 		}
 	}
 
 	function drawExecutionProgressBar() {
 		var offset = getOffset();
 
-		context.strokeStyle = '#fff';
-		context.strokeRect((placeholder.coords[0] - offset[0]) * 30, (placeholder.coords[1] - offset[1]) * 30, 30, 30);
+		placeholderContext.clearRect(0, 0, 30, 30);
+		placeholderContext.lineWidth = 0.9;
+		placeholderContext.strokeStyle = '#fff';
+		placeholderContext.strokeRect(0, 0, 30, 30);
 
 		if (placeholder.timer == null) {
 			placeholder.timer = setInterval(
 				function() {
 					if (placeholder.timerTimeout == null) {
-						clearInterval(placeholder.timer);
-						placeholder.timer = null;
+						player.executing = false;
+						resetExecutingTimer();
 					}
 					var width = 28 - (placeholder.timerTimeout / 100);
-					context.fillStyle = '#fff';
-					context.fillRect((placeholder.coords[0] - offset[0]) * 30 + 1, (placeholder.coords[1] - offset[1]) * 30 + 24, width, 4);
+					placeholderContext.fillStyle = '#fff';
+					placeholderContext.fillRect(2, 24, width, 4);
 					placeholder.timerTimeout -= 100;
 				},
 				100
@@ -883,9 +900,13 @@ $(function() {
 
 	function resetExecutingTimer() {
 		if (player.executingTimer != null) {
+			player.executing = false;
 			clearTimeout(player.executingTimer);
+			placeholder.timerTimeout = null;
 			clearInterval(placeholder.timer);
 			placeholder.timer = null;
+			placeholder.show = false;
+			placeholderElement.hide();
 		}
 	}
 
