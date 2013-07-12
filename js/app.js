@@ -78,6 +78,11 @@ $(function() {
 		{ text: "Все, пизда тебе!!!", len: 90 },
 		{ text: "СУКА!!!11 ААА!!!111", len: 90 }
 	];
+	
+	var NPCsNames = [
+		['Гарольд', 'Кумар', 'Тэнк', 'Стэн', 'Андрюша', 'Хохол', 'Лёха', 'Марик', 'Танз', 'Нэд', 'Фродо', 'Йода', ],
+		['Зелёный', 'Непобедимый', 'Грязный', 'Вонючий', 'Большой', 'Трусливый', 'Красноглазый', 'Сумчатый', 'Невыносимый', 'Капитан', 'Железный', 'Плакса', 'Красавчик', ]
+	];
 
 	var drop  = {
 		'tree' : [
@@ -165,8 +170,6 @@ $(function() {
 			var rockCount  =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
 			var npcCount   =  Math.floor((maxItemsCount - treeCount - rockCount) * (Math.random() * npcFactor) / 100);
 
-			console.log(npcCount);
-
 			/* камни */
 			for (var i = rockCount; i--;) {
 				var x = Math.floor(Math.random() * HEIGHT);
@@ -187,36 +190,29 @@ $(function() {
 					var randomX = Math.floor(Math.random() * HEIGHT),
 						randomY = Math.floor(Math.random() * WIDTH);
 
-
 					// попытаемся посмотреть, был ли уже лес на верхней и левой границах
 					var prevForestCoords = [];
 					for (var j = WIDTH; j--;) {
 						if (levels[0].map[blockY - 1] != undefined && levels[0].map[blockY - 1][blockX + j] != undefined && levels[0].map[blockY - 1][blockX + j] == 'tree') {
-							//newMap[0][i] = 'water';
 							prevForestCoords.push([j, 1]);
 						}
 						if (levels[0].map[blockY + HEIGHT - 1] != undefined && levels[0].map[blockY + HEIGHT - 1][blockX + j] != undefined && levels[0].map[blockY + HEIGHT - 1][blockX + j] == 'tree') {
-							//newMap[HEIGHT - 1][i] = 'water';
 							prevForestCoords.push([j, HEIGHT + 1]);
 						}
 					}
 
 					for (var j = HEIGHT; j--;) {
 						if (levels[0].map[blockY + j] != undefined && levels[0].map[blockY + j][blockX - 1] != undefined && levels[0].map[blockY + j][blockX - 1] == 'tree') {
-							//newMap[i][0] = 'water';
 							prevForestCoords.push([1, i]);
 						}
 						if (levels[0].map[blockY + j] != undefined && levels[0].map[blockY + j][blockX + WIDTH - 1] != undefined && levels[0].map[blockY + j][blockX + WIDTH - 1] == 'tree') {
-							//newMap[i][WIDTH - 1] = 'water';
 							prevForestCoords.push([WIDTH + 1, j]);
 						}
 					}
 
-					
 					var usePrevForest = (Math.floor((Math.random() * 10)) > 5 && treeFactor > 50) ? true : false;
 
 					if (prevForestCoords.length > 0 && usePrevForest) {
-						
 						var poo = prevForestCoords[Math.floor(Math.random() * prevForestCoords.length)];
 						randomX = poo[0];
 						randomY = poo[1];
@@ -231,11 +227,10 @@ $(function() {
 					var x = Math.floor(Math.random() * HEIGHT);
 					var y = Math.floor(Math.random() * WIDTH);
 
-					if(newMap[x][y] == 'ground') {
+					if (newMap[x][y] == 'ground') {
 						newMap[Math.floor(Math.random() * HEIGHT)][Math.floor(Math.random() * WIDTH)] = 'tree';
 						i--;
 					}
-					
 				}
 				
 			}
@@ -275,30 +270,28 @@ $(function() {
 
 			newMap = drawRivers(newMap, waterSources);
 
-
 			// NPC
-
+			var offset = getOffset();
 			for (var i = npcCount; i--;) {
+				// чтоб не возникали неожиданно на открытой территории
+				var positions = [[0, 0], [19, 0], [19, 19], [0, 19]],
+					randomPos = Math.floor(Math.random() * positions.length);
 				
-				var y = Math.floor(Math.random() * HEIGHT);
-				var x = Math.floor(Math.random() * WIDTH)
-				
-				if(newMap[y][x] == 'ground') {
-
+				if (newMap[y][x] == 'ground') {
 					// get random npc
 					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
 					
-					npcItem.coords = [x, y];
+					npcItem.name = NPCsNames[1][Math.floor(Math.random() * NPCsNames[1].length)] + ' ' + NPCsNames[0][Math.floor(Math.random() * NPCsNames[0].length)];
+					npcItem.coords = [offset[0] + positions[randomPos][0], offset[1] + positions[randomPos][1]];
+
 					levels[0].npc.push(npcItem);
 					//newMap[y][x] = npcItem.type;
 				}
 			}
-
+			initNPCs();
 
 			return newMap;
 		}
-
-		
 
 		function drawForest(map, count, x, y) {
 			for (var i = count; i--;) {
@@ -329,11 +322,10 @@ $(function() {
 
 		function drawRivers(map, sources) {
 			for (var i = sources.length; i--;) {
-				var direction = Math.round(Math.random() * 4),
-					x = sources[i][0],
+				var x = sources[i][0],
 					y = sources[i][1];
 
-				switch (direction) {
+				switch (Math.round(Math.random() * 4)) {
 					case 0:
 						y--; 
 					break;
@@ -442,13 +434,13 @@ $(function() {
 	function drawPlayer() {
 		var offset = getOffset();
 
-		context.font = 'bold 16px sans-serif';
-		context.fillStyle = '#000';
-		context.textAlign = 'center';
-		context.textBaseline = 'middle';
-
-		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
 		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30);
+
+		// context.font = 'bold 16px sans-serif';
+		// context.fillStyle = '#000';
+		// context.textAlign = 'center';
+		// context.textBaseline = 'middle';
+		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
 	}
 	
 	function redraw() {
@@ -873,7 +865,6 @@ $(function() {
 
 
 	function drawNpcSpeech(npc) {
-
 		var offset = getOffset();
 		var item = npcSpeech[Math.floor(Math.random() * npcSpeech.length)];
 
@@ -882,8 +873,6 @@ $(function() {
 
 		context.fillStyle = '#fff';
 		context.fillRect(x, y, item.len, 10);
-
-		
 
 		context.font = 'normal 9px sans-serif';
 		context.fillStyle = '#333';
@@ -894,8 +883,6 @@ $(function() {
 		context.textAlign = 'end';
 		
 		context.strokeStyle = '#fff';
-		
-		
 	}
 
 
@@ -907,59 +894,93 @@ $(function() {
 		}
 	}
 
-	function moveNpc(npc) {
+	function moveNpc(coords) {
+		var x = coords[0],
+			y = coords[1];
 
-		var x 			= npc.coords[0];
-		var y 			= npc.coords[1];
-		var direction 	= Math.round(Math.random() * 4);
-
-		switch (direction) {
+		switch (Math.round(Math.random() * 4)) {
 		   	case 0: 
 		    	y--;
-		   		break;
+			break;
 		   	case 1: 
 		    	x++;
-		   		break;
+			break;
 		   	case 2: 
 		   	 	y++;
-		   		break;
+			break;
 		    case 3: 
 		    	x--;
-		   		break;
+			break;
 		}
 
-
 		if (levels[0].map[y] != undefined && levels[0].map[y][x] != undefined && levels[0].map[y][x] == 'ground') {
-	   		npc.coords = [x, y];
+	   		return [x, y];
 	 	}
 
-	 	return npc;
-
+	 	return coords;
 	}
 
 
 	function drawNPC() {
-		
 		var offset = getOffset();
-		for(var i in levels[0].npc) {
 
+		for (var i = levels[0].npc.length; i--; ) {
+			var currentNPC = levels[0].npc[i],
+				x = (currentNPC.coords[0] - offset[0]) * 30,
+				y = (currentNPC.coords[1] - offset[1]) * 30;
 
-			var currentNpc 	= levels[0].npc[i];
-			var needMove 	= (Math.floor(Math.random() * 2) + 1 == 1)  ? true : false; 
-			if(needMove) {
-				currentNpc 	= moveNpc(currentNpc);
-			}
+			context.drawImage(getBlockSprite(currentNPC.type), x, y);
+			context.font = 'normal 9px sans-serif';
+			context.fillStyle = '#fff';
+			context.textAlign = 'center';
+			context.textBaseline = 'middle';
+			context.fillText(currentNPC.name, x + 15, y + 30);
 			
-			var needTalk 	= (Math.floor(Math.random() * 5 + 1) == 1)  ? true : false; 
-
-			if(needTalk) {
-				drawNpcSpeech(currentNpc);
+			if (currentNPC.needTalk) {
+				context.fillRect(x, y, currentNPC.talkPhrase.len, 10);
+				context.fillStyle = '#333';
+				context.textAlign = 'start';
+				context.textBaseline = 'middle';
+				context.fillText(currentNPC.talkPhrase.text, x - 3, y + 5);
 			}
-
-			context.drawImage(getBlockSprite(currentNpc.type), (currentNpc.coords[0] - offset[0]) * 30, (currentNpc.coords[1] - offset[1]) * 30);
-
 		}
-		
+	}
+	
+	function initNPCs() {
+		for (var i = levels[0].npc.length; i--;) {
+			var currentNPC = levels[0].npc[i];
+
+			if (currentNPC.timer == undefined) {
+				currentNPC.timer = function() {
+					var self = this,
+						speed = Math.floor(Math.random() * (2500 - 500 + 1)) + 500;
+
+					setInterval(
+						function() {
+							var needMove = Math.random() > 0.5; 
+							if (needMove) {
+								self.coords = moveNpc(self.coords);
+							}
+							if (self.talkTimeout == undefined) {
+								self.needTalk = Math.random() > 0.7;
+								if (self.needTalk) {
+									self.talkPhrase = npcSpeech[Math.floor(Math.random() * npcSpeech.length)];
+									self.talkTimeout = setTimeout(
+										function() {
+											self.needTalk = false;
+											self.talkTimeout = undefined;
+										},
+										1000
+									);
+								}
+							}
+						},
+						speed
+					);
+				};
+				currentNPC.timer();
+			}
+		}
 	}
 
 	function drawStatusbar() {
@@ -1014,7 +1035,6 @@ $(function() {
 	}
 
 	function pickItem(blockType) {
-		
 		player.items[blockType] = player.items[blockType] != undefined ? player.items[blockType] + 1 : 1;
 	}
 
@@ -1050,13 +1070,23 @@ $(function() {
 
 		generateMap();
 		redraw();
-		drawNPC();
 
+		initNPCs();
+
+
+		// redraw
+		setInterval(
+			function() {
+				redraw();
+				drawNPC();
+			},
+			99
+		);
+
+		// environment
 		setInterval(
 			function() {
 				environment();
-				redraw();
-				drawNPC();
 			},
 			1000
 		);
