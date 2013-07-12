@@ -38,10 +38,14 @@ $(function() {
 
 	var player = {
 		coords: [0, 0],
+		oldCoords: [0, 0],
+		pixelOffset: [0, 0],
 		items: {},
+		speed: 150, // percents
 		selectedItem: null,
 		executing: false,
-		executingTimer: null
+		executingTimer: null,
+		moving: false
 	};
 
 	var placeholder = {
@@ -88,7 +92,7 @@ $(function() {
 		'Всё вокруг кажется мне плоским',
 		'На самом деле я доктор honoris causa',
 		'Поговорим о нарративе?',
-		'Кажется, я отравился печенькой',
+		'Похоже, я отравился печенькой',
 		'*Посвистывает*',
 		'*Громко стонет*',
 		'*Озирается вокруг*',
@@ -107,6 +111,9 @@ $(function() {
 		'На днях открыл свой стартап',
 		'Java для лохов',
 		'Занимайтесь любовью, а не игрой',
+		'А вы не видели тут чебурашку?',
+		'А он что?',
+		'А она что?',
 	];
 	
 	var NPCsNames = [
@@ -117,30 +124,44 @@ $(function() {
 	var drop  = {
 		'tree' : [
 			{
-				'name' : 'hueta1',
+				'name' : 'item1',
 				'droprate' : 5,
-				'title' : 'Неведомая хуета из дерева' 
+				'title' : 'Айтем 1' 
 			},
 			{
-				'name' : 'hueta2',
+				'name' : 'item2',
 				'droprate' : 10,
-				'title' : 'Еще одна неведомая хуета из дерева' 
+				'title' : 'Айтем 2' 
 			}
 		]
 	}
 
 	function drawLevel() {
 		var offset = getOffset();
+		var ooffset = getOldOffset();
 
-		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
-			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
+		context.save();
+
+		if (player.moving) {
+			var translate = [0, 0];
+			if (offset[0] > 0 || (player.oldCoords[0] == 11 && player.coords[0] == 10)) {
+				translate[0] = player.pixelOffset[0] * -1;
+			}
+			if (offset[1] > 0 || (player.oldCoords[1] == 11 && player.coords[1] == 10)) {
+				translate[1] = player.pixelOffset[1] * -1;
+			}
+			context.translate(translate[0], translate[1]);
+		}		
+		
+		for (var i = offset[1] - 1; i < offset[1] + HEIGHT + 1; i++) {
+			for (var j = offset[0] - 1; j < offset[0] + WIDTH + 1; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
 					var	blockSprite = getBlockSprite(levels[0].map[i][j]),
 						sprite = Math.floor((i + j * 1.71) % blockSprite.count);
-					context.drawImage(blockSprite, sprite * 30, 0, 30, 30, (j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
+					context.drawImage(blockSprite, sprite * 30, 0, 30, 30, (j - ooffset[0]) * 30, (i - ooffset[1]) * 30, 30, 30);
 				} else {
 					context.fillStyle = '#000';
-					context.fillRect((j - offset[0]) * 30, (i - offset[1]) * 30, 30, 30);
+					context.fillRect((j - ooffset[0]) * 30, (i - ooffset[1]) * 30, 30, 30);
 				}
 			}
 		}
@@ -158,8 +179,8 @@ $(function() {
 		}
 
 		// рисуем берега
-		for (var i = offset[1]; i < offset[1] + HEIGHT; i++) {
-			for (var j = offset[0]; j < offset[0] + WIDTH; j++) {
+		for (var i = offset[1] - 1; i < offset[1] + HEIGHT + 1; i++) {
+			for (var j = offset[0] - 1; j < offset[0] + WIDTH + 1; j++) {
 				if (levels[0].map[i] != undefined && levels[0].map[i][j] != undefined) {
 					if (levels[0].map[i][j] == 'water') {
 						var translate = [0, 0],
@@ -167,22 +188,22 @@ $(function() {
 							coords = [-15, -15];
 
 						if (levels[0].map[i][j - 1] != undefined && levels[0].map[i][j - 1] != 'water' && levels[0].map[i][j - 1] != 'bridge') {
-							translate = [(j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15];
+							translate = [(j - ooffset[0] + 1) * 30 - 15, (i - ooffset[1] + 1) * 30 - 15];
 							rotate = 1.56;
 							drawCoast(translate, rotate, [j - 1, i]);
 						}
 						if (levels[0].map[i][j + 1] != undefined && levels[0].map[i][j + 1] != 'water' && levels[0].map[i][j + 1] != 'bridge') {
-							translate = [(j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15];
+							translate = [(j - ooffset[0] + 1) * 30 - 15, (i - ooffset[1] + 1) * 30 - 15];
 							rotate = 4.7;
 							drawCoast(translate, rotate, [j + 1, i]);
 						}
 						if (levels[0].map[i - 1] != undefined && levels[0].map[i - 1][j] != undefined && levels[0].map[i - 1][j] != 'water' && levels[0].map[i - 1][j] != 'bridge') {
-							translate = [(j - offset[0] + 1) * 30 - 15, (i - offset[1] + 1) * 30 - 15];
+							translate = [(j - ooffset[0] + 1) * 30 - 15, (i - ooffset[1] + 1) * 30 - 15];
 							rotate = 3.13;
 							drawCoast(translate, rotate, [j, i - 1]);
 						}
 						if (levels[0].map[i + 1] != undefined && levels[0].map[i + 1][j] != undefined && levels[0].map[i + 1][j] != 'water' && levels[0].map[i + 1][j] != 'bridge') {
-							translate = [(j - offset[0]) * 30 + 15, (i - offset[1]) * 30 + 15];
+							translate = [(j - ooffset[0]) * 30 + 15, (i - ooffset[1]) * 30 + 15];
 							rotate = 0;
 							drawCoast(translate, rotate, [j, i + 1]);
 						}
@@ -191,6 +212,9 @@ $(function() {
 				}
 			}
 		}
+		
+				
+		context.restore();
 	}
 
 	function generateMap() {
@@ -471,11 +495,53 @@ $(function() {
 	function getOffset() {
 		return [player.coords[0] < Math.floor(WIDTH / 2) ? 0 : player.coords[0] - Math.floor(WIDTH / 2), player.coords[1] < Math.floor(HEIGHT / 2) ? 0 : player.coords[1] - Math.floor(HEIGHT / 2)];
 	}
+	
+	function getOldOffset() {
+		return [player.oldCoords[0] < Math.floor(WIDTH / 2) ? 0 : player.oldCoords[0] - Math.floor(WIDTH / 2), player.oldCoords[1] < Math.floor(HEIGHT / 2) ? 0 : player.oldCoords[1] - Math.floor(HEIGHT / 2)];
+	}
 
 	function drawPlayer() {
-		var offset = getOffset();
+		var offset = getOffset(),
+			movePerTick = Math.round(99 / 30 * (player.speed / 100))
+			x = player.coords[0],
+			y = player.coords[1];
 
-		context.drawImage(getBlockSprite('player'), (player.coords[0] - offset[0]) * 30, (player.coords[1] - offset[1]) * 30);
+		context.save();
+
+		if (player.moving) {
+			if (player.pixelOffset[0] >= 30 || player.pixelOffset[1] >= 30 || player.pixelOffset[0] <= -30 || player.pixelOffset[1] <= -30) {
+				player.moving = false;
+				player.pixelOffset = [0, 0];
+				player.oldCoords = [player.coords[0], player.coords[1]];
+			} else {
+				if (player.oldCoords[0] < player.coords[0]) {
+					player.pixelOffset[0] += movePerTick;
+				}
+				if (player.oldCoords[0] > player.coords[0]) {
+					player.pixelOffset[0] -= movePerTick;
+				}
+				if (player.oldCoords[1] < player.coords[1]) {
+					player.pixelOffset[1] += movePerTick;
+				}
+				if (player.oldCoords[1] > player.coords[1]) {
+					player.pixelOffset[1] -= movePerTick;
+				}
+				var translate = [0, 0];
+				if (offset[0] == 0 && player.pixelOffset[0] != 0 && !(player.coords[0] == 10 && player.oldCoords[0] == 11)) {
+					x = player.oldCoords[0];
+					translate[0] = player.pixelOffset[0];
+				}
+				if (offset[1] == 0 && player.pixelOffset[1] != 0 && !(player.coords[1] == 10 && player.oldCoords[1] == 11)) {
+					y = player.oldCoords[1];
+					translate[1] = player.pixelOffset[1];
+				}
+				context.translate(translate[0], translate[1]);
+			}
+		}
+
+		context.drawImage(getBlockSprite('player'), (x - offset[0]) * 30, (y - offset[1]) * 30);
+		
+		context.restore();
 
 		// context.font = 'bold 16px sans-serif';
 		// context.fillStyle = '#000';
@@ -596,46 +662,47 @@ $(function() {
 	}
 
 	function processPlayer(button) {
+		player.executing = false;
+		resetExecutingTimer();
+	
 		switch (button) {
 			case 40:
-				if (canPass(player.coords[0], player.coords[1] + 1)) {
+				if (!player.moving && canPass(player.coords[0], player.coords[1] + 1)) {
+					player.oldCoords = [player.coords[0], player.coords[1]];
+					player.moving = true;
 					player.coords[1]++;
-					player.executing = false;
-					resetExecutingTimer();
 					generateMap();
 				}
 			break;
 
 			case 39:
-				if (canPass(player.coords[0] + 1, player.coords[1])) {
+				if (!player.moving && canPass(player.coords[0] + 1, player.coords[1])) {
+					player.oldCoords = [player.coords[0], player.coords[1]];
+					player.moving = true;
 					player.coords[0]++;
-					player.executing = false;
-					resetExecutingTimer();
 					generateMap();
 				}
 			break;
 
 			case 38:
-				if (canPass(player.coords[0], player.coords[1] - 1)) {
+				if (!player.moving && canPass(player.coords[0], player.coords[1] - 1)) {
+					player.oldCoords = [player.coords[0], player.coords[1]];
+					player.moving = true;
 					player.coords[1]--;
-					player.executing = false;
-					resetExecutingTimer();
 					generateMap();
 				}
 			break;
 
 			case 37:
-				if (canPass(player.coords[0] - 1, player.coords[1])) {
+				if (!player.moving && canPass(player.coords[0] - 1, player.coords[1])) {
+					player.oldCoords = [player.coords[0], player.coords[1]];
+					player.moving = true;
 					player.coords[0]--;
-					player.executing = false;
-					resetExecutingTimer();
 					generateMap();
 				}
 			break;
 
 			case 88:
-				player.executing = false;
-				resetExecutingTimer();
 				placeholder.coords[0] = player.coords[0];
 				placeholder.coords[1] = player.coords[1];
 
