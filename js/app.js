@@ -19,7 +19,7 @@ $(function() {
 			rockFactor 	: 20, // 20% камней
 			treeFactor 	: 65, // 70% леса
 			waterFactor : 10,
-			npcFactor	: 1,
+			npcFactor	: 5,
 			map 		: [ ],
 			npc 		: [ ]
 		}
@@ -326,6 +326,7 @@ $(function() {
 					
 					npcItem.name = NPCsNames[1][Math.floor(Math.random() * NPCsNames[1].length)] + ' ' + NPCsNames[0][Math.floor(Math.random() * NPCsNames[0].length)];
 					npcItem.coords = [offset[0] + positions[randomPos][0], offset[1] + positions[randomPos][1]];
+
 					levels[0].npc.push(npcItem);
 				}
 			}
@@ -488,7 +489,7 @@ $(function() {
 		drawLevel();
 		drawPlayer();
 		drawStatusbar();
-		drawNPC();
+		
 
 		trueContext.drawImage(buffer, 0, 0);
 	}
@@ -1123,12 +1124,15 @@ $(function() {
 
 		generateMap();
 		redraw();
+
 		initNPCs();
+
 
 		// redraw
 		setInterval(
 			function() {
 				redraw();
+				drawNPC();
 			},
 			99
 		);
