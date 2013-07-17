@@ -3,6 +3,8 @@ $(function() {
 	var WIDTH = 20,
 		HEIGHT = 20;
 
+	var TICK = 30;
+		
 	var canvasElement = $('#cnv'),
 		trueContext = canvasElement[0].getContext('2d'),
 		placeholderElement = $('<canvas width="30" height="30" style="position: absolute" />').appendTo('body'),
@@ -61,22 +63,26 @@ $(function() {
 		{
 			type 			: 'npc_green',
 			aggressive 		: false,
-			coords 			: [0, 0]
+			coords 			: [0, 0],
+			moving: false
 		},
 		{
 			type 			: 'npc_blue',
 			aggressive  	: false,
-			coords 			: [0, 0]
+			coords 			: [0, 0],
+			moving: false
 		},
 		{
 			type 			: 'npc_red',
 			aggressive 		: true,
-			coords 			: [0, 0]
+			coords 			: [0, 0],
+			moving: false
 		},
 		{
 			type 			: 'npc_yellow',
 			aggressive 		: true,
-			coords 			: [0, 0]
+			coords 			: [0, 0],
+			moving: false
 		}
 	];
 
@@ -212,7 +218,9 @@ $(function() {
 				}
 			}
 		}
-		
+
+		/* сюда из-за сдвига канваса */
+		drawNPC();
 				
 		context.restore();
 	}
@@ -235,7 +243,6 @@ $(function() {
 			
 			var treeCount  =  Math.floor(maxItemsCount * (Math.random() * treeFactor) / 100);
 			var rockCount  =  Math.floor((maxItemsCount - treeCount) * (Math.random() * rockFactor) / 100);
-			var npcCount   =  Math.floor((maxItemsCount - treeCount - rockCount) * (Math.random() * npcFactor) / 100);
 
 			/* камни */
 			for (var i = rockCount; i--;) {
@@ -337,24 +344,6 @@ $(function() {
 
 			newMap = drawRivers(newMap, waterSources);
 
-			// NPC
-			var offset = getOffset();
-			for (var i = npcCount; i--;) {
-				// чтоб не возникали неожиданно на открытой территории
-				var positions = [[0, 0], [19, 0], [19, 19], [0, 19]],
-					randomPos = Math.floor(Math.random() * positions.length);
-				
-				if (newMap[positions[randomPos][1]][positions[randomPos][0]] == 'ground') {
-					// get random npc
-					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
-					
-					npcItem.name = NPCsNames[1][Math.floor(Math.random() * NPCsNames[1].length)] + ' ' + NPCsNames[0][Math.floor(Math.random() * NPCsNames[0].length)];
-					npcItem.coords = [offset[0] + positions[randomPos][0], offset[1] + positions[randomPos][1]];
-					levels[0].npc.push(npcItem);
-				}
-			}
-			initNPCs();
-
 			return newMap;
 		}
 
@@ -426,6 +415,27 @@ $(function() {
 					levels[0].map[blockY * HEIGHT + i][blockX * WIDTH + j] = newMap[i][j];
 				}
 			}
+			
+			// NPC
+			var npcCount = Math.floor(Math.random() * (HEIGHT * WIDTH / 100) * levels[0].npcFactor);
+			for (var i = npcCount; i--;) {
+				// чтоб не возникали неожиданно на открытой территории
+				var positions = [[0, 0], [19, 0], [19, 19], [0, 19]],
+					randomPos = Math.floor(Math.random() * positions.length);
+				
+				if (newMap[positions[randomPos][1]][positions[randomPos][0]] == 'ground') {
+					// get random npc
+					/* Хаос! эта фигня не работает! объект передаётся по ссылке! */
+					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
+					/* а это работает: */
+					var npcItem = $.extend({}, npcs[Math.floor(Math.random() * npcs.length)]);
+
+					npcItem.name = NPCsNames[1][Math.floor(Math.random() * NPCsNames[1].length)] + ' ' + NPCsNames[0][Math.floor(Math.random() * NPCsNames[0].length)];
+					npcItem.coords = [blockX * WIDTH + positions[randomPos][0], blockY * HEIGHT + positions[randomPos][1]];
+					levels[0].npc.push(npcItem);
+				}
+			}
+			initNPCs();
 		}
 		
 		function addRow(blockY) {
@@ -502,7 +512,7 @@ $(function() {
 
 	function drawPlayer() {
 		var offset = getOffset(),
-			movePerTick = Math.round(99 / 30 * (player.speed / 100))
+			movePerTick = Math.round(TICK / 30 * (player.speed / 100))
 			x = player.coords[0],
 			y = player.coords[1];
 
@@ -542,19 +552,12 @@ $(function() {
 		context.drawImage(getBlockSprite('player'), (x - offset[0]) * 30, (y - offset[1]) * 30);
 		
 		context.restore();
-
-		// context.font = 'bold 16px sans-serif';
-		// context.fillStyle = '#000';
-		// context.textAlign = 'center';
-		// context.textBaseline = 'middle';
-		//context.fillText('@', (player.coords[0] - offset[0]) * 30 + 15, (player.coords[1] - offset[1]) * 30 + 15);
 	}
 	
 	function redraw() {
 		drawLevel();
 		drawPlayer();
 		drawStatusbar();
-		drawNPC();
 
 		trueContext.drawImage(buffer, 0, 0);
 	}
@@ -701,7 +704,18 @@ $(function() {
 					generateMap();
 				}
 			break;
+			
+			case 78:
+				for (var i = levels[0].npc.length; i--; ) {
+					var currentNPC = levels[0].npc[i];
+					console.log(currentNPC);
+				}
+			break;
 
+			case 77:
+				console.log(npcs);
+			break;
+			
 			case 88:
 				placeholder.coords[0] = player.coords[0];
 				placeholder.coords[1] = player.coords[1];
@@ -862,7 +876,6 @@ $(function() {
 
 
 	function execute() {
-
 		var blockType 			= levels[0].map[placeholder.coords[1]][placeholder.coords[0]],
 			blockDefenitions 	= {
 									'ground' : {
@@ -914,7 +927,7 @@ $(function() {
 						var item = drop[blockType][i];
 
 						var rand = Math.floor(Math.random() * item.droprate + 1);
-						var dropItem = (rand == 1) ? true : false;
+						var dropItem = (rand == 1);
 
 						if(dropItem) {
 							dropped = true;
@@ -1033,14 +1046,42 @@ $(function() {
 	}
 
 	function drawNPC() {
-		var offset = getOffset(),
+		var offset = getOldOffset(),
 			textWidth = 110;
 
 		for (var i = levels[0].npc.length; i--; ) {
 			var currentNPC = levels[0].npc[i],
 				x = (currentNPC.coords[0] - offset[0]) * 30,
-				y = (currentNPC.coords[1] - offset[1]) * 30;
+				y = (currentNPC.coords[1] - offset[1]) * 30,
+				movePerTick = Math.round(TICK / 30 * (currentNPC.moveSpeed / 100));
 
+			context.save();
+
+			if (currentNPC.moving) {
+				if ((currentNPC.coords[0] == currentNPC.oldCoords[0] && currentNPC.coords[1] == currentNPC.oldCoords[1]) || (currentNPC.pixelOffset[0] >= 30 || currentNPC.pixelOffset[1] >= 30 || currentNPC.pixelOffset[0] <= -30 || currentNPC.pixelOffset[1] <= -30)) {
+					currentNPC.moving = false;
+					currentNPC.pixelOffset = [0, 0];
+					currentNPC.oldCoords = [currentNPC.coords[0], currentNPC.coords[1]];
+				} else {
+					if (currentNPC.oldCoords[0] < currentNPC.coords[0]) {
+						currentNPC.pixelOffset[0] += movePerTick;
+					}
+					if (currentNPC.oldCoords[0] > currentNPC.coords[0]) {
+						currentNPC.pixelOffset[0] -= movePerTick;
+					}
+					if (currentNPC.oldCoords[1] < currentNPC.coords[1]) {
+						currentNPC.pixelOffset[1] += movePerTick;
+					}
+					if (currentNPC.oldCoords[1] > currentNPC.coords[1]) {
+						currentNPC.pixelOffset[1] -= movePerTick;
+					}
+					x = (currentNPC.oldCoords[0] - offset[0]) * 30;
+					y = (currentNPC.oldCoords[1] - offset[1]) * 30;
+					var translate = [currentNPC.pixelOffset[0], currentNPC.pixelOffset[1]];
+					context.translate(translate[0], translate[1]);
+				}
+			}
+				
 			context.drawImage(getBlockSprite(currentNPC.type), x, y);
 			context.font = 'normal 9px sans-serif';
 			context.fillStyle = '#fff';
@@ -1062,6 +1103,8 @@ $(function() {
 				context.fillStyle = '#000';
 				drawMultiLine(currentNPC.talkPhrase, x + 3, y + 2 - pos[1], textWidth, 9 + 3, true);
 			}
+			
+			context.restore();
 		}
 	}
 	
@@ -1076,9 +1119,15 @@ $(function() {
 
 					setInterval(
 						function() {
-							var needMove = Math.random() > 0.5; 
+							var needMove = Math.random() > 0.5;
 							if (needMove) {
-								self.coords = moveNpc(self.coords);
+								if (!self.moving) {
+									self.oldCoords = [self.coords[0], self.coords[1]];
+									self.pixelOffset = [0, 0];
+									self.coords = moveNpc(self.coords);
+									self.moving = true;
+									self.moveSpeed = Math.floor(Math.random() * (200 + 1)) + 50;
+								}
 							}
 							if (self.talkTimeout == undefined) {
 								self.needTalk = Math.random() > 0.7;
@@ -1197,7 +1246,7 @@ $(function() {
 			function() {
 				redraw();
 			},
-			99
+			TICK
 		);
 
 		// environment
