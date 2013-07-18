@@ -423,7 +423,7 @@ $(function() {
 				var positions = [[0, 0], [19, 0], [19, 19], [0, 19]],
 					randomPos = Math.floor(Math.random() * positions.length);
 				
-				if (newMap[positions[randomPos][1]][positions[randomPos][0]] == 'ground') {
+				if (canPass(blockX * WIDTH + positions[randomPos][0], blockY * HEIGHT + positions[randomPos][1])) {
 					// get random npc
 					/* Хаос! эта фигня не работает! объект передаётся по ссылке! */
 					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
@@ -512,7 +512,7 @@ $(function() {
 
 	function drawPlayer() {
 		var offset = getOffset(),
-			movePerTick = Math.round(TICK / 30 * (player.speed / 100))
+			movePerTick = TICK / 30 * (player.speed / 100),
 			x = player.coords[0],
 			y = player.coords[1];
 
@@ -565,9 +565,15 @@ $(function() {
 	function canPass(blockX, blockY) {
 		var pass = {'ground': true, 'bridge': true};
 
-		if (levels[0].map[blockY] != undefined && levels[0].map[blockY][blockX] != undefined) {
+		if (!(blockX == player.coords[0] && blockY == player.coords[1]) && levels[0].map[blockY] != undefined && levels[0].map[blockY][blockX] != undefined) {
+			for (var i = levels[0].npc.length; i--; ) {
+				if (blockX == levels[0].npc[i].coords[0] && blockY == levels[0].npc[i].coords[1]) {
+					return false;
+				}
+			}
 			return pass[levels[0].map[blockY][blockX]] != undefined;
 		}
+
 		return false;
 	}
 
@@ -1009,7 +1015,7 @@ $(function() {
 			break;
 		}
 
-		if (levels[0].map[y] != undefined && levels[0].map[y][x] != undefined && (levels[0].map[y][x] == 'ground' || levels[0].map[y][x] == 'bridge')) {
+		if (canPass(x, y)) {
 	   		return [x, y];
 	 	}
 
