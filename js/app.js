@@ -59,74 +59,6 @@ $(function() {
 
 	var images = {};
 
-	var npcs = [
-		{
-			type 			: 'npc_green',
-			aggressive 		: false,
-			coords 			: [0, 0],
-			moving: false
-		},
-		{
-			type 			: 'npc_blue',
-			aggressive  	: false,
-			coords 			: [0, 0],
-			moving: false
-		},
-		{
-			type 			: 'npc_red',
-			aggressive 		: true,
-			coords 			: [0, 0],
-			moving: false
-		},
-		{
-			type 			: 'npc_yellow',
-			aggressive 		: true,
-			coords 			: [0, 0],
-			moving: false
-		}
-	];
-
-	var npcSpeech = [
-		'Пристрелите меня, кто-нибудь',
-		'Не подскажете, как пройти до библиотеки?',
-		'Да у тебя и зубы золотые!',
-		'Бежевый! Я покрашу потолок в бежевый!',
-		'Проходит как-то ирландец мимо бара...',
-		'Иногда сигара - это просто сигара',
-		'Был у меня один кореш, не употреблял ничего',
-		'Эх, а вот в наше время...',
-		'Всё вокруг кажется мне плоским',
-		'На самом деле я доктор honoris causa',
-		'Поговорим о нарративе?',
-		'Похоже, я отравился печенькой',
-		'*Посвистывает*',
-		'*Громко стонет*',
-		'*Озирается вокруг*',
-		'Уважаемый сэр или мадам, подайте голодающему организму',
-		'Запость это в твиттер',
-		'Отступать некуда, за нами 2D',
-		'Позвольте, я почитаю вам Бродского?',
-		'Ваши пальцы пахнут ладаном...',
-		'*Напевает*',
-		'Кажется, я заблудился',
-		'Разрешите вас проводить?',
-		'Какой длины впп в Испании?',
-		'Лошадкаааа!!!',
-		'Мы ещё встретимся',
-		'В детстве меня звали "Кусок кода"',
-		'На днях открыл свой стартап',
-		'Java для лохов',
-		'Занимайтесь любовью, а не игрой',
-		'А вы не видели тут чебурашку?',
-		'А он что?',
-		'А она что?',
-	];
-	
-	var NPCsNames = [
-		['Гарольд', 'Кумар', 'Тэнк', 'Стэн', 'Андрюша', 'Хохол', 'Лёха', 'Марик', 'Танз', 'Нэд', 'Фродо', 'Йода', ],
-		['Зелёный', 'Непобедимый', 'Грязный', 'Вонючий', 'Большой', 'Трусливый', 'Красноглазый', 'Сумчатый', 'Невыносимый', 'Капитан', 'Железный', 'Плакса', 'Красавчик', ]
-	];
-
 	var drop  = {
 		'tree' : [
 			{
@@ -424,18 +356,11 @@ $(function() {
 					randomPos = Math.floor(Math.random() * positions.length);
 				
 				if (canPass(blockX * WIDTH + positions[randomPos][0], blockY * HEIGHT + positions[randomPos][1])) {
-					// get random npc
-					/* Хаос! эта фигня не работает! объект передаётся по ссылке! */
-					var npcItem = npcs[Math.floor(Math.random() * npcs.length)];	
-					/* а это работает: */
-					var npcItem = $.extend({}, npcs[Math.floor(Math.random() * npcs.length)]);
-
-					npcItem.name = NPCsNames[1][Math.floor(Math.random() * NPCsNames[1].length)] + ' ' + NPCsNames[0][Math.floor(Math.random() * NPCsNames[0].length)];
-					npcItem.coords = [blockX * WIDTH + positions[randomPos][0], blockY * HEIGHT + positions[randomPos][1]];
+					var npcItem = new npc(blockX * WIDTH + positions[randomPos][0], blockY * HEIGHT + positions[randomPos][1]);
+					npcItem.checkPass = canPass;
 					levels[0].npc.push(npcItem);
 				}
 			}
-			initNPCs();
 		}
 		
 		function addRow(blockY) {
@@ -996,33 +921,6 @@ $(function() {
 		}
 	}
 
-	function moveNpc(coords) {
-		var x = coords[0],
-			y = coords[1];
-
-		switch (Math.round(Math.random() * 4)) {
-		   	case 0: 
-		    	y--;
-			break;
-		   	case 1: 
-		    	x++;
-			break;
-		   	case 2: 
-		   	 	y++;
-			break;
-		    case 3: 
-		    	x--;
-			break;
-		}
-
-		if (canPass(x, y)) {
-	   		return [x, y];
-	 	}
-
-	 	return coords;
-	}
-
-
 	function drawMultiLine(phrase, x, y, maxWidth, lineHeight, reverse) {
 		var words = phrase.split(' '),
 			top = y,
@@ -1088,7 +986,7 @@ $(function() {
 				}
 			}
 				
-			context.drawImage(getBlockSprite(currentNPC.type), x, y);
+			context.drawImage(getBlockSprite(currentNPC.behaviour.type), x, y);
 			context.font = 'normal 9px sans-serif';
 			context.fillStyle = '#fff';
 			context.textAlign = 'center';
@@ -1111,49 +1009,6 @@ $(function() {
 			}
 			
 			context.restore();
-		}
-	}
-	
-	function initNPCs() {
-		for (var i = levels[0].npc.length; i--;) {
-			var currentNPC = levels[0].npc[i];
-
-			if (currentNPC.timer == undefined) {
-				currentNPC.timer = function() {
-					var self = this,
-						speed = Math.floor(Math.random() * (2500 - 500 + 1)) + 500;
-
-					setInterval(
-						function() {
-							var needMove = Math.random() > 0.5;
-							if (needMove) {
-								if (!self.moving) {
-									self.oldCoords = [self.coords[0], self.coords[1]];
-									self.pixelOffset = [0, 0];
-									self.coords = moveNpc(self.coords);
-									self.moving = true;
-									self.moveSpeed = Math.floor(Math.random() * (200 + 1)) + 50;
-								}
-							}
-							if (self.talkTimeout == undefined) {
-								self.needTalk = Math.random() > 0.7;
-								if (self.needTalk) {
-									self.talkPhrase = npcSpeech[Math.floor(Math.random() * npcSpeech.length)];
-									self.talkTimeout = setTimeout(
-										function() {
-											self.needTalk = false;
-											self.talkTimeout = undefined;
-										},
-										2000
-									);
-								}
-							}
-						},
-						speed
-					);
-				};
-				currentNPC.timer();
-			}
 		}
 	}
 
@@ -1245,7 +1100,6 @@ $(function() {
 
 		generateMap();
 		redraw();
-		initNPCs();
 
 		// redraw
 		setInterval(
